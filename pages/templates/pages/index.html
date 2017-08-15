@@ -21,7 +21,7 @@
         <div class="article">
             <p>published: {{ article.published_date }}</p>
             <h1>{{ article.title }}</h1>
-            <p class="article-text">{{ article.text|linebreaksbr }}</p>
+            <p class="article-text">{{ article.text | safe }}</p> {# Replaced linebreaksbr by safe to render images inserted with TinyMCE. #}
         </div>
         {% endfor %}
 

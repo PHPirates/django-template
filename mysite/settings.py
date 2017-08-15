@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'pages',
+    'tinymce',  # Text editor for website backend
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,9 +75,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-# NOTE copied from the default settings.py for flexible at
-# https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/appengine/flexible/django_cloudsql/mysite/settings.py
-# [START dbconfig]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -123,3 +121,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'advanced',
+    'relative_urls': False,
+    'width': 800,
+    'height': 400,
+    'content_css': '/static/pages/style.css',
+    'plugins': 'paste',
+    'paste_as_text': True,
+}

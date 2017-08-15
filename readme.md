@@ -2,6 +2,7 @@
 
 #### Makes use of
 * PostgreSQL
+* The[TinyMCE](https://www.tinymce.com/) editor
 * HTML templates
 * CSS
 * Directory structure from [docs.djangoproject.com](https://docs.djangoproject.com/en/1.11/intro/tutorial01/).
