@@ -1,3 +1,4 @@
+""" Models are objects used in the website. """
 from django.db import models
 from django.utils import timezone
 from tinymce.models import HTMLField
@@ -5,7 +6,7 @@ from tinymce.models import HTMLField
 
 class Article(models.Model):
     """" This model is an article. """
-    author = models.ForeignKey('auth.User')
+    author = models.ForeignKey('auth.User', on_delete=models.PROTECT)
     title = models.CharField(max_length=200)
     # An HTMLField will use the TinyMCE editor, a TextField won't
     text = HTMLField()
