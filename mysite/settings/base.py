@@ -96,9 +96,25 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
+# https://docs.djangoproject.com/en/dev/howto/static-files/
 
+# Place where the static files will end up after collectstatic.
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# Place where static files will be served on you website, http://website.com/STATIC_URL/app/style.css for example.
+# In production this will be replaced by the NGINX config file
 STATIC_URL = '/static/'
+
+# the list of folder where Django will search for additional static files, in addition to each static folder of each
+# app installed.
+STATICFILES_DIRS = [
+]
+
+# Makes sure Django looks for static files in each static folder in each app
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
+
 
 TINYMCE_DEFAULT_CONFIG = {
     'theme': 'advanced',

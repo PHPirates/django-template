@@ -1,32 +1,19 @@
+{%  extends 'pages/base.html' %}
 {% load static %} {# Prepare for loading own css. #}
 
-<html>
-    <head>
-        <title>mysite</title>
-        {# Include bootstrap #}
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+{% block content %}
 
-        {# Include own css. #}
-        <link rel="stylesheet" type="text/css" href="{% static 'pages/style.css' %}" />
+<div class="page-header">
+    <h1>Django template</h1>
+    <h2>This is just a default website.</h2>
+</div>
 
-        {# Include favicon #}
-        <link rel="shortcut icon" type="image/ico" href="{% static 'pages/favicon.ico' %}" />
+{% for article in article_list %}
+<div class="article">
+    <p>published: {{ article.published_date }}</p>
+    <h1>{{ article.title }}</h1>
+    <p class="article-text">{{ article.text | safe }}</p> {# Replaced linebreaksbr by safe to render images inserted with TinyMCE. #}
+</div>
+{% endfor %}
 
-        <link href="https://fonts.googleapis.com/css?family=Kalam" rel="stylesheet">
-    <body>
-        <div class="page-header">
-            <h1>Django template</h1>
-            <h2>This is just a default website.</h2>
-        </div>
-
-        {% for article in article_list %}
-        <div class="article">
-            <p>published: {{ article.published_date }}</p>
-            <h1>{{ article.title }}</h1>
-            <p class="article-text">{{ article.text | safe }}</p> {# Replaced linebreaksbr by safe to render images inserted with TinyMCE. #}
-        </div>
-        {% endfor %}
-
-    </body>
-</html>
+{% endblock content %}

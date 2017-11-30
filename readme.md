@@ -24,12 +24,7 @@
 * Access the backend by navigating to [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
 * (tip) If you already have a local website running, changing the port number allows you to keep things separate.
 
-# todo
-* Home page extending from base html
-* static files settings
-* add nginx, supervisor settings etc.
-
-# Deploying on Ubuntu 16.04
+# Deploying on an Ubuntu 16.04 server
 We will use nginx and gunicorn.
 Make sure that your production settings are kept secret!
 It is assumed that the server is already up and running and that you can execute `sudo` commands via SSH or so.
