@@ -25,13 +25,15 @@
 * (tip) If you already have a local website running, changing the port number allows you to keep things separate.
 
 # Deploying on an Ubuntu 16.04 server
-We will use a postgres database, gunicorn to serve the website, and nginx to 'reverse proxy' requests from outside to gunicorn.
-It makes life easier if you also use PyCharm and supervisor to manage gunicorn.
-Make sure that your production settings are kept secret!
+There are a lot of tutorials around, but I have noticed that instructions get obsolete very quickly, so preferably select the latest one you can find which uses exactly all the tools you want. For me that was the one I had to write myself, as below.
+
+We will use a **postgres** database, **gunicorn** to serve the website, and **nginx** to 'reverse proxy' requests from outside to gunicorn.
+It makes life easier if you also use **PyCharm** and **supervisor** to manage gunicorn.
+
 It is assumed that the server is already up and running and that you can execute `sudo` commands via SSH.
 
 * Set up login with a key pair.
-* Add your server to IntelliJ in Settings - Build, Execution, Deployment - Deployment, choose SFTP, enter the IP address of your server in SFTP host, specify user name and your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also specify web server root url as `http://ipadress'.
+* Add your server to IntelliJ in Settings - Build, Execution, Deployment - Deployment, choose SFTP, enter the IP address of your server in SFTP host, specify user name and your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also specify web server root url as `http://ipadress`.
 * Make the server the default one by clicking an icon a few to the right of the 'plus' you used to add the server.
 * You should now be able to ssh into your server with Tools - Start SSH Session (assigning a shortcut to this is a good idea).
 
@@ -41,7 +43,6 @@ It is assumed that the server is already up and running and that you can execute
 * Install the packages we need with `sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx`.
 
 ## Setting up postgres
-Probably it's best to follow any recent tutorial, but you can also try the steps below.
 * Start a postgres session with `sudo -u postgres psql`.
 * `CREATE DATABASE mysite_db;`
 * `CREATE USER mysite WITH PASSWORD 'apassword';`
@@ -110,4 +111,15 @@ get_random_string(50, chars)
 * Try to reach your website. If it doesn't work, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
 
 ## <a name="remember">To remember</a>
-* Every time after you change a supervisor config file in `/etc/supervisor/conf.d/mysite.conf`, you have to do `sudo supervisorctl reread` and `sudo supervisorctl update`.
+### Django files
+After making changes to Django files, run `sudo supervisorctl restart mysite`.
+### Django models
+After making changes to Django models, in PyCharm start Tools - Run Manage.py Task  and run `makemigrations --settings=mysite.settings.production` and `migrate --settings=mysite.settings.production` (or from the command line, `python3.6 manage.py makemigrations --settings=...`)
+### Static files
+After making changes to static files run as manage.py task `collectstatic`. If run from the command line, I think you need to activate the virtual environment first.
+### Supervisor config
+Every time after you change a supervisor config file in `/etc/supervisor/conf.d/mysite.conf`, you have to do `sudo supervisorctl reread` and `sudo supervisorctl update`.
+### nginx config
+After changing nginx config files in `/etc/nginx/sites-available/mysite`, test syntax with `sudo nginx -t` and run `sudo service nginx restart`.
+### logs
+nginx logs are viewed with `tail /var/log/long.err.log` or `tail /var/log/long.out.log`.
