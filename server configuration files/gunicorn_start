@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd /opt/mysite_env/mysite
+source ../bin/activate
+export DJANGO_SETTINGS_MODULE=mysite.settings.production
+export PYTHONPATH=/opt/mysite_env/mysite:$PYTHONPATH
+gunicorn mysite.wsgi:application --bind=unix:/opt/mysite_env/mysite/run/gunicorn.sock
