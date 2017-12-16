@@ -6,8 +6,18 @@ upstream mysite_server {
   server unix:/opt/env/mysite/run/gunicorn.sock fail_timeout=0;
 }
 
+# Redirects http requests to https
 server {
     listen 80;
+    server_name mysite.com;
+    return 301 https://mysite.com$request_uri;
+}
+
+server {
+    listen 443 default ssl;
+
+    ssl_certificate /etc/letsencrypt/live/mysite.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mysite.com/privkey.pem;
 
     server_name mysite.com;
 

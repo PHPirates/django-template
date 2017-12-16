@@ -108,6 +108,11 @@ get_random_string(50, chars)
 * Test the syntax of your nginx config file with `sudo nginx -t` and fix any.
 * Restart nginx with `sudo service nginx restart`. 
 * In case that failed, check the logs at `tail /var/log/long.err.log` or `tail /var/log/long.out.log` to view the error.
+
+## Setting up HTTPS
+Because it's not much work and free, just do it.
+
+* You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx).
 * Try to reach your website. If it doesn't work, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
 
 ## <a name="remember">To remember</a>

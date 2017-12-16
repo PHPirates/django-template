@@ -21,3 +21,8 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+# Settings for serving with https
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
