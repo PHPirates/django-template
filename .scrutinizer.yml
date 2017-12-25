@@ -21,4 +21,4 @@ filter:
     excluded_paths:
         - '*/test/*'
         - '*/migrations/*'
-        - 'site/'
+        - '*/site' # python's site.py gets analyzed by default
