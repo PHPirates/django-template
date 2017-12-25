@@ -1,5 +1,4 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+""" This file contains the views, the 'pages' of the website. """
 from django.utils import timezone
 from django.views import generic
 
