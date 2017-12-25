@@ -1,5 +1,5 @@
 filter:
-    excluded_paths: "*/migrations/*"
+    excluded_paths: ["*/migrations/*"]
 checks:
     python:
         code_rating: true
