@@ -33,18 +33,29 @@
 There are a lot of tutorials around, but I have noticed that instructions get obsolete very quickly, so preferably select the latest one you can find which uses exactly all the tools you want. For me that was the one I had to write myself, as below.
 
 We will use a **postgres** database, **gunicorn** to serve the website, and **nginx** to 'reverse proxy' requests from outside to gunicorn.
-It makes life easier if you also use **PyCharm** and **supervisor** to manage gunicorn.
+It makes life easier if you also use **PyCharm**, and **supervisor** to manage gunicorn.
 
-It is assumed that the server is already up and running and that you can execute `sudo` commands via SSH.
+It is assumed that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash.
 
-* Set up login with a key pair.
-* Add your server to IntelliJ in Settings - Build, Execution, Deployment - Deployment, choose SFTP, enter the IP address of your server in SFTP host, specify user name and your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also specify web server root url as `http://ipadress`.
+Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
+
+## Setting up users and login
+
+* Log in via SSH with the root user. Make a new user with your name with `adduser eve`. Give her root permissions with `usermod -aG sudo eve`.
+* Impersonate her with `sudo su - eve`.
+* Set up login with a key pair, if needed on your local computer generate keys. View your public key with `cat ~/.ssh/id_rsa.pub` and copy it.
+* Install a text editor, for example `sudo apt-get install nano`.
+* To put it on the server, use `mkdir ~/.ssh`, `chmod 700 ~/.ssh`, `nano ~/.ssh/authorized_keys` and `chmod 600 ~/.ssh/authorized_keys`.
+* Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
+
+## Local setup
+* Add your server to IntelliJ in Settings - Build, Execution, Deployment - Deployment, click on the plus icon, choose SFTP, enter the IP address of your server in SFTP host, specify user name and your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also, if not already done, specify web server root url as `http://ipadress`.
 * Make the server the default one by clicking an icon a few to the right of the 'plus' you used to add the server.
+* Go to Settings - Tools - SSH Terminal and select the server as Deployment server.
 * You should now be able to ssh into your server with Tools - Start SSH Session (assigning a shortcut to this is a good idea).
 
 * If needed point your (sub)domain to the ip address of your server, probably in the settings of your hosting provider.
 
-* Just in case, `sudo apt-get update`.
 * Install the packages we need with `sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx`.
 
 ## Setting up postgres
