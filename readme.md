@@ -1,5 +1,6 @@
 [![Build Status](https://scrutinizer-ci.com/g/PHPirates/django-template/badges/build.png?b=master)](https://scrutinizer-ci.com/g/PHPirates/django-template/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/PHPirates/django-template/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/PHPirates/django-template/?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1e52d96b4c3b4bc586827a483287ec3c)](https://www.codacy.com/app/PHPirates/django-template?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PHPirates/django-template&amp;utm_campaign=Badge_Grade)
 
 # Django template project
 
@@ -47,9 +48,12 @@ Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anythi
 * Install a text editor, for example `sudo apt-get install nano`.
 * To put it on the server, use `mkdir ~/.ssh`, `chmod 700 ~/.ssh`, `nano ~/.ssh/authorized_keys` and `chmod 600 ~/.ssh/authorized_keys`.
 * Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
+* Install a firewall, `sudo apt-get install ufw`.
+* Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx`.
+* `sudo ufw enable` and check with `sudo ufw status`.
 
 ## Local setup
-* Add your server to IntelliJ in Settings - Build, Execution, Deployment - Deployment, click on the plus icon, choose SFTP, enter the IP address of your server in SFTP host, specify user name and your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also, if not already done, specify web server root url as `http://ipadress`.
+* Add your server to PyCharm in Settings - Build, Execution, Deployment - Deployment, click on the plus icon, choose SFTP, enter the IP address of your server in SFTP host, specify user name and your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also, if not already done, specify web server root url as `http://ipadress`.
 * Make the server the default one by clicking an icon a few to the right of the 'plus' you used to add the server.
 * Go to Settings - Tools - SSH Terminal and select the server as Deployment server.
 * You should now be able to ssh into your server with Tools - Start SSH Session (assigning a shortcut to this is a good idea).
@@ -61,42 +65,45 @@ Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anythi
 ## Setting up postgres
 * Start a postgres session with `sudo -u postgres psql`.
 * `CREATE DATABASE mysite_db;`
-* `CREATE USER mysite WITH PASSWORD 'apassword';`
+* `CREATE USER mysite WITH PASSWORD '1234';`
 * `ALTER ROLE mysite SET client_encoding TO 'utf8';`
 * `ALTER ROLE mysite SET default_transaction_isolation TO 'read committed';`
 * Now check if the timezone in `settings/base.py` is correct, if not you can modify it to for example `Europe/Amsterdam`. Then `ALTER ROLE mysite SET timezone TO 'Europe/Amsterdam';`
 * `GRANT ALL PRIVILEGES ON DATABASE mysite_db to mysite;`
 * `\q` to exit
 * Update the production database settings in `mysite/settings/production.py`
-* Generate secret key to enter in the same file, with
+* Generate a new secret key to enter in the same file. For example using PyCharm's Python console with
 ```python
 from django.utils.crypto import get_random_string
 
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-get_random_string(50, chars)
+print(get_random_string(50, chars))
 ```
 * Make sure to keep this file secret. Also don't forget to check `DEBUG = False` in here.
 * While you're there, also add your website domain to `ALLOWED_HOSTS` in the base settings.
 
 
 ## Setting up a virtual environment
-* Check if you're running the python 3 version of pip with `pip -V`
-* Check for updates with `pip install --upgrade pip`.
+* Back on the server, update pip with `pip3 install --upgrade pip`. 
+* Check that you're running the python 3 version of pip with `pip -V`
+* Ensure ownership of python to install packages with `sudo chown -R eve:eve /usr/local`.
 * Install the package with `pip install virtualenv`.
 * I happen to want my virtual environments in `/opt/` so I do `cd /opt`.
 * Make sure you create a virtual environment with the latest python you installed! Creating a virtual environment appears to be very much liable to change with python versions, so be sure to check online.
-* I had python 3.6 installed, checked with `python3.6 -V`. Then I should be able to create a virtual environment with `sudo python3.6 -m venv mysite_env`, but in my case venv was broken or something because it exited 1.
-* I solved that by doing `sudo python3.6 -m venv --without-pip mysite_env`, `source mysite_env/bin/activate`, `sudo apt-get install curl`, then found out curl doesn't run as sudo so did `sudo bash -c "curl https://bootstrap.pypa.io/get-pip.py | python"` then `deactivate` and `source mysite_env/bin/activate`. Checked with `python -V` for correct python version.
+* Install venv with `sudo apt-get install python3-venv`.
+* I had python 3.5 installed, checked with `python3.5 -V`. Then you should be able to create a virtual environment with `sudo python3.6 -m venv mysite_env`.
+* If that does not work, I once solved that under python 3.6 by doing `sudo python3.6 -m venv --without-pip mysite_env`, `source mysite_env/bin/activate`, `sudo apt-get install curl`, then found out curl doesn't run as sudo so did `sudo bash -c "curl https://bootstrap.pypa.io/get-pip.py | python"` then `deactivate`. 
 * Every time you want to do something in your virtual environment, activate it with `source mysite_env/bin/activate`. Do so, now.
-* If you set the virtual environment up without pip, download it with `wget https://bootstrap.pypa.io/get-pip.py`, install with `python3.6 get-pip.py`. 
-* Check with `which pip` and `which python3.6` that everything points inside your virtual environment.
+* Check with `python -V` for correct python version.
+* If you did set the virtual environment up without pip, download it with `wget https://bootstrap.pypa.io/get-pip.py`, install with `python3.6 get-pip.py`. 
+* Check with `which pip` and `which python` that everything points inside your virtual environment. If you do need to use for example python3.6 instead of python, remember that or fix the `python` command to avoid mistakes.
 
 ## Uploading project and installing dependencies
-* `cd mysite_env` and `sudo mkdir mysite`
+* `cd mysite_env` and `sudo mkdir mysite`, then correct ownership with `sudo chown -R eve:eve /opt/`.
 * In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. Under Options you can specify to upload changes automatically or if you hit `CTRL+S`.
-* Try to upload your files. In my case I had to change the Web server root url to my project folder, but normally this shouldn't be necessary I think.
-* If you succeeded, first install `sudo apt-get install python3.6-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
-* If you didn't remember, check with `which python3.6` (with virtualenv activated) where your python hides, then in PyCharm go to Settings - Project Interpreter and add a new remote one, selecting Deployment Configuration and Create Copy of Deployment Server, then select the right path to your python.
+* Try to upload your files. Fiddle a bit and you'll find a way to upload everything, for example using Tools - Deployment - Upload to ...
+* If you succeeded, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
+* If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings - Project Interpreter and add a new remote one, selecting Deployment Configuration and Move Deployment Server, then select the right path to your python.
 * PyCharm should warn you about some dependencies from requirements.txt not being installed, do that. Probably PyCharm will also install helper files which can take a long time.
 * Make sure you have the remote python selected as interpreter, (you can also check for package updates there), now you can just like before hit Tools - Run Manage.py Task and run `makemigrations` and `migrate` but now both with production settings: so `makemigrations --settings=mysite.settings.production` and also for `migrate`.
 * If needed, create superuser also as before.
