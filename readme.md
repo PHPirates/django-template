@@ -1,6 +1,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/PHPirates/django-template/badges/build.png?b=master)](https://scrutinizer-ci.com/g/PHPirates/django-template/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/PHPirates/django-template/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/PHPirates/django-template/?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1e52d96b4c3b4bc586827a483287ec3c)](https://www.codacy.com/app/PHPirates/django-template?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PHPirates/django-template&amp;utm_campaign=Badge_Grade)
+[![Codeclimate](https://api.codeclimate.com/v1/badges/7ee6b92b294863348693/maintainability)](https://codeclimate.com/github/PHPirates/django-template/maintainability)
 
 # Django template project
 
