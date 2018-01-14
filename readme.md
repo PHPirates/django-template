@@ -59,7 +59,7 @@ Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anythi
 * Go to Settings - Tools - SSH Terminal and select the server as Deployment server.
 * You should now be able to ssh into your server with Tools - Start SSH Session (assigning a shortcut to this is a good idea).
 
-* If needed point your (sub)domain to the ip address of your server, probably in the settings of your hosting provider.
+* If needed point your (sub)domain to the ip address of your server, probably in the settings of the provider where you registered the domains. This can take a few hours to take effect.
 
 * Install the packages we need with `sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx`.
 
@@ -81,7 +81,7 @@ chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 print(get_random_string(50, chars))
 ```
 * Make sure to keep this file secret. Also don't forget to check `DEBUG = False` in here.
-* While you're there, also add your website domain to `ALLOWED_HOSTS` in the base settings.
+* While you're there, also add your website domain to `ALLOWED_HOSTS` in the base settings. Be sure to add your server's ip address as well if you want to debug with that!
 
 
 ## Setting up a virtual environment
@@ -92,7 +92,7 @@ print(get_random_string(50, chars))
 * I happen to want my virtual environments in `/opt/` so I do `cd /opt`.
 * Make sure you create a virtual environment with the latest python you installed! Creating a virtual environment appears to be very much liable to change with python versions, so be sure to check online.
 * Install venv with `sudo apt-get install python3-venv`.
-* I had python 3.5 installed, checked with `python3.5 -V`. Then you should be able to create a virtual environment with `sudo python3.6 -m venv mysite_env`.
+* I had python 3.5 installed, checked with `python3.5 -V`. Then you should be able to create a virtual environment with `sudo python3.5 -m venv mysite_env`.
 * If that does not work, I once solved that under python 3.6 by doing `sudo python3.6 -m venv --without-pip mysite_env`, `source mysite_env/bin/activate`, `sudo apt-get install curl`, then found out curl doesn't run as sudo so did `sudo bash -c "curl https://bootstrap.pypa.io/get-pip.py | python"` then `deactivate`. 
 * Every time you want to do something in your virtual environment, activate it with `source mysite_env/bin/activate`. Do so, now.
 * Check with `python -V` for correct python version.
@@ -102,7 +102,7 @@ print(get_random_string(50, chars))
 ## Uploading project and installing dependencies
 * `cd mysite_env` and `sudo mkdir mysite`, then correct ownership with `sudo chown -R eve:eve /opt/`.
 * In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. Under Options you can specify to upload changes automatically or if you hit `CTRL+S`.
-* Try to upload your files. Fiddle a bit and you'll find a way to upload everything, for example using Tools - Deployment - Upload to ...
+* Select your project folder in the PyCharm project view and try to upload your files with `CTRL+S` (if you chose that option) or Tools - Deployment - Upload to ...
 * If you succeeded, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
 * If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings - Project Interpreter and add a new remote one, selecting Deployment Configuration and Move Deployment Server, then select the right path to your python.
 * PyCharm should warn you about some dependencies from requirements.txt not being installed, do that. Probably PyCharm will also install helper files which can take a long time.
@@ -112,8 +112,7 @@ print(get_random_string(50, chars))
 
 ## Setting up gunicorn
 * We will setup gunicorn such that nginx will be able to redirect requests to gunicorn which is bound to the Django server.
-* Install gunicorn into your virtualenv with pip or via PyCharm - Project Interpreter.
-* Put the `gunicorn_start` script in `/opt/mysite_env/bin/` (after changing all the paths, of course), make sure it has executable permissions: `nano /opt/mysite_env/bin/gunicorn_start` (do not use sudo here) and `sudo chmod u+x /opt/mysite_env/bin/gunicorn_start`.
+* Put the `gunicorn_start` script in `/opt/mysite_env/bin/` (after changing all the paths, of course), make sure it has executable permissions: create file with `nano /opt/mysite_env/bin/gunicorn_start` (do not use sudo here) and `sudo chmod u+x /opt/mysite_env/bin/gunicorn_start`.
 
 ## Setting up supervisor
 * We use supervisor to manage the starting and stopping of gunicorn. If your server would crash or for whatever reason is restarted, this makes sure to automatically start your website too.
@@ -124,19 +123,23 @@ print(get_random_string(50, chars))
 
 ## Setting up nginx
 * Install with `sudo apt-get install nginx`
-* We use the ufw firewall, make sure it's installed, check `sudo ufw status`. You can open ports with `sudo ufw allow 80`. I have opened ports 80 (HTTP), 443 (HTTPS), OpenSSH and 5432 (Postgres) although not sure if that last one was necessary.
 * Edit the content of nginx-config into `sudo nano /etc/nginx/sites-available/mysite`.
 * Enable your site by making the symbolic link `sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/mysite`
+* Remove the symbolic link to the default config, `rm /etc/nginx/sites-enabled/default`
 * Create empty log file `mkdir /opt/mysite_env/mysite/logs/` and `touch /opt/mysite_env/mysite/logs/nginx-access.log`.
-* Create empty socket `/opt/mysite_env/mysite/run/gunicorn.sock` in the same way. A socket is just a text file, with the great usefulness of enabling nginx to talk to gunicorn in a language that they both understand.
+* Make the socket directory with `mkdir /opt/mysite_env/mysite/run/`.
+* If at any time you get some error that the socket does not exist, create an empty socket file `/opt/mysite_env/mysite/run/gunicorn.sock` in the same way. If at any time you get the error that this is not a socket, remove it. A socket is just a text file, with the great usefulness of enabling nginx to talk to gunicorn in a language that they both understand.
+* Make sure the lines in the nginx config which point to the ssl certificates are commented.
 * Test the syntax of your nginx config file with `sudo nginx -t` and fix any.
-* Restart nginx with `sudo service nginx restart`. 
-* In case that failed, check the logs at `tail /var/log/long.err.log` or `tail /var/log/long.out.log` to view the error.
 
 ## Setting up HTTPS
 Because it's not much work and free, just do it.
 
 * You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx).
+* Possibly you need to `sudo fuser -k 80/tcp` to clean things up after setting up https. 
+* Then start nginx with `sudo service nginx start`.
+* In the future, restart nginx with `sudo service nginx restart`. 
+* In case that fails, check the logs at `tail /var/log/long.err.log` or `tail /var/log/long.out.log` to view the error.
 * Try to reach your website. If it doesn't work, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
 
 ## <a name="remember">To remember</a>
@@ -151,4 +154,4 @@ Every time after you change a supervisor config file in `/etc/supervisor/conf.d/
 ### nginx config
 After changing nginx config files in `/etc/nginx/sites-available/mysite`, test syntax with `sudo nginx -t` and run `sudo service nginx restart`.
 ### logs
-nginx logs are viewed with `tail /var/log/long.err.log` or `tail /var/log/long.out.log`.
+nginx logs are viewed with `tail /var/log/long.err.log` or `tail /var/log/long.out.log`, or `tail /opt/mysite_env/mysite/logs/nginx-error.log` as specified in the nginx config file.

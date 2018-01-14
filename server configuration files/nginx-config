@@ -3,14 +3,20 @@ upstream mysite_server {
   # to return a good HTTP response (in case the Unicorn master nukes a
   # single worker for timing out).
 
-  server unix:/opt/env/mysite/run/gunicorn.sock fail_timeout=0;
+  server unix:/opt/mysite_env/mysite/run/gunicorn.sock fail_timeout=0;
 }
 
 # Redirects http requests to https
 server {
     listen 80;
+    server_name mysite.com www.mysite.com;
+    return 301 https://www.mysite.com$request_uri;
+}
+
+server {
+    listen 443;
     server_name mysite.com;
-    return 301 https://mysite.com$request_uri;
+    return 301 https://www.mysite.com$request_uri;
 }
 
 server {
@@ -19,7 +25,7 @@ server {
     ssl_certificate /etc/letsencrypt/live/mysite.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/mysite.com/privkey.pem;
 
-    server_name mysite.com;
+    server_name www.mysite.com;
 
     # Use option below if you want to allow other websites to for example put your website as src in an iframe. Requires package nginx-extras.
     # Just adding a header will result in conflicting headers.
@@ -28,12 +34,12 @@ server {
 
     client_max_body_size 4G;
 
-    access_log /opt/env/mysite/logs/nginx-access.log;
-    error_log /opt/env/mysite/logs/nginx-error.log;
+    access_log /opt/mysite_env/mysite/logs/nginx-access.log;
+    error_log /opt/mysite_env/mysite/logs/nginx-error.log;
 
     location /static/ {
         autoindex on;
-        alias /opt/env/mysite/mysite/static/;
+        alias /opt/mysite_env/mysite/mysite/static/;
     }
 
     location / {
@@ -69,7 +75,7 @@ server {
     }
 
     location /favicon.ico {
-            alias /opt/env/mysite/mysite/static/pages/favicon.ico;
+            alias /opt/mysite_env/mysite/mysite/static/pages/favicon.ico;
     }
         
     # Error pages
