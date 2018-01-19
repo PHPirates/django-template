@@ -46,9 +46,9 @@ Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anythi
 * Log in via SSH with the root user. Make a new user with your name with `adduser eve`. Give her root permissions with `usermod -aG sudo eve`.
 * Impersonate her with `sudo su - eve`.
 * Set up login with a key pair, if needed on your local computer generate keys. View your public key with `cat ~/.ssh/id_rsa.pub` and copy it.
-* Install a text editor, for example `sudo apt-get install nano`.
 * To put it on the server, use `mkdir ~/.ssh`, `chmod 700 ~/.ssh`, `nano ~/.ssh/authorized_keys` and `chmod 600 ~/.ssh/authorized_keys`.
 * Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
+* Install a text editor, for example `sudo apt-get install nano`.
 * Install a firewall, `sudo apt-get install ufw`.
 * Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx`.
 * `sudo ufw enable` and check with `sudo ufw status`.
@@ -77,7 +77,7 @@ Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anythi
 ```python
 from django.utils.crypto import get_random_string
 
-chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^*(-_=+)'
 print(get_random_string(50, chars))
 ```
 * Make sure to keep this file secret. Also don't forget to check `DEBUG = False` in here.
@@ -107,12 +107,12 @@ print(get_random_string(50, chars))
 * If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings - Project Interpreter and add a new remote one, selecting Deployment Configuration and Move Deployment Server, then select the right path to your python.
 * PyCharm should warn you about some dependencies from requirements.txt not being installed, do that. Probably PyCharm will also install helper files which can take a long time.
 * Make sure you have the remote python selected as interpreter, (you can also check for package updates there), now you can just like before hit Tools - Run Manage.py Task and run `makemigrations` and `migrate` but now both with production settings: so `makemigrations --settings=mysite.settings.production` and also for `migrate`.
-* If needed, create superuser also as before.
+* If needed, create superuser just as with local setup, `createsuperuser --username myname`.
 * Run `collectstatic --settings=mysite.settings.production` to gather static files for nginx to serve.
 
 ## Setting up gunicorn
 * We will setup gunicorn such that nginx will be able to redirect requests to gunicorn which is bound to the Django server.
-* Put the `gunicorn_start` script in `/opt/mysite_env/bin/` (after changing all the paths, of course), make sure it has executable permissions: create file with `nano /opt/mysite_env/bin/gunicorn_start` (do not use sudo here) and `sudo chmod u+x /opt/mysite_env/bin/gunicorn_start`.
+* Put the `gunicorn_start` script in `/opt/mysite_env/bin/` (after changing all the paths, of course), make sure it has executable permissions: create file with `nano /opt/mysite_env/bin/gunicorn_start` (do not use sudo or FileZilla here) and `sudo chmod u+x /opt/mysite_env/bin/gunicorn_start`.
 
 ## Setting up supervisor
 * We use supervisor to manage the starting and stopping of gunicorn. If your server would crash or for whatever reason is restarted, this makes sure to automatically start your website too.
@@ -135,7 +135,7 @@ print(get_random_string(50, chars))
 ## Setting up HTTPS
 Because it's not much work and free, just do it.
 
-* You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx).
+* You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx). If you need to choose, you are not serving files out of a directory on the server. Also, it's possible that after running certbot it has automatically added lines in the nginx config which point to the ssl certificates (multiple times!). You probably want to replace the old lines you commented out previously with these ones.
 * Possibly you need to `sudo fuser -k 80/tcp` to clean things up after setting up https. 
 * Then start nginx with `sudo service nginx start`.
 * In the future, restart nginx with `sudo service nginx restart`. 
