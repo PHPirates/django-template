@@ -82,6 +82,15 @@ print(get_random_string(50, chars))
 ```
 * Make sure to keep this file secret. Also don't forget to check `DEBUG = False` in here.
 * While you're there, also add your website domain to `ALLOWED_HOSTS` in the base settings. Be sure to add your server's ip address as well if you want to debug with that!
+* Lastly, to enable connection from outside, you need to add to `/etc/postgresql/9.5/main/postgresql.conf` just at the end, `listen_addresses = '*'` and in `/etc/postgresl/9.5/main/pg_hba.conf` you need to add `host all all 0.0.0.0/0 md5`.
+* Restart postgres with `sudo /etc/init.d/postgresql restart`.
+* If at any time you get the error 
+```
+psycopg2.OperationalError: could not connect to server: Connection refused
+	Is the server running on host "x.x.x.x" and accepting
+	TCP/IP connections on port 5432?
+```
+then the previous steps could be the problem (or your firewall is still blocking 5432, of course, or ... ).
 
 
 ## Setting up a virtual environment
