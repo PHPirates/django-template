@@ -1,3 +1,7 @@
 .idea/*
 **/__pycache__/*
 static/*
+venv/
+Lib/
+Scripts/
+pyvenv.cfg

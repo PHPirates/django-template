@@ -1,6 +1,6 @@
-Django==2.0.1
+Django==2.0.4
 mysqlclient==1.3.12
-wheel==0.30.0
+wheel==0.31.0
 gunicorn==19.7.1
-psycopg2==2.7.3.2
+psycopg2==2.7.4
 django-tinymce==2.7.0
