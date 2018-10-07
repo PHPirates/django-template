@@ -45,7 +45,7 @@ It makes life easier if you also use **PyCharm**, and **supervisor** to manage g
 ## Buy the necessary services
 
 * You will want to buy a VPS, which is a (virtual) server on which you can install whatever you want. Make sure not to buy something called 'shared hosting' as it probably means you can only upload static files. At the moment a VPS can be as cheap as five euros a month.
-* If you don't have a domain yet, you can probably buy it via de same company as you bought the VPS. If you have one, you can probably transfer the management of it to that company. You could also leave it as you have it, and just point the DNS to the ip address of the VPS.
+* If you don't have a domain yet, you can probably buy it via the same company as you bought the VPS. If you have one, you can probably transfer the management of it to that company. You could also leave it as you have it, and just point the DNS to the ip address of the VPS.
 
 From now on we assume that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash or using Pycharm.
 
