@@ -5,6 +5,10 @@
 
 # Django template project
 
+## Table of Contents
+* Instructions to run the website on a local computer
+* Instructions to run the website on a server
+
 #### Makes use of
 * PostgreSQL
 * The [TinyMCE](https://www.tinymce.com/) editor
@@ -12,7 +16,7 @@
 * CSS
 * Directory structure from [docs.djangoproject.com](https://docs.djangoproject.com/en/1.11/intro/tutorial01/).
 
-## Instructions to run the website locally
+# Instructions to run the website locally
 
 * Create a project, and download the files to that location.
 * Probably you want to use a virtual environment.
@@ -38,7 +42,12 @@ There are a lot of tutorials around, but I have noticed that instructions get ob
 We will use a **postgres** database, **gunicorn** to serve the website, and **nginx** to 'reverse proxy' requests from outside to gunicorn.
 It makes life easier if you also use **PyCharm**, and **supervisor** to manage gunicorn.
 
-It is assumed that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash.
+## Buy the necessary services
+
+* You will want to buy a VPS, which is a (virtual) server on which you can install whatever you want. Make sure not to buy something called 'shared hosting' as it probably means you can only upload static files. At the moment a VPS can be as cheap as five euros a month.
+* If you don't have a domain yet, you can probably buy it via de same company as you bought the VPS. If you have one, you can probably transfer the management of it to that company. You could also leave it as you have it, and just point the DNS to the ip address of the VPS.
+
+From now on we assume that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash or using Pycharm.
 
 Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 
