@@ -36,7 +36,7 @@
 * Access the backend by navigating to [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
 * (tip) If you already have a local website running, changing the port number allows you to keep things separate.
 
-# Deploying on an Ubuntu 16.04 server
+# Deploying on an Ubuntu server
 There are a lot of tutorials around, but I have noticed that instructions get obsolete very quickly, so preferably select the latest one you can find which uses exactly all the tools you want. For me that was the one I had to write myself, as below.
 
 We will use a **postgres** database, **gunicorn** to serve the website, and **nginx** to 'reverse proxy' requests from outside to gunicorn.
@@ -45,6 +45,8 @@ It makes life easier if you also use **PyCharm**, and **supervisor** to manage g
 ## Buy the necessary services
 
 * You will want to buy a VPS, which is a (virtual) server on which you can install whatever you want. Make sure not to buy something called 'shared hosting' as it probably means you can only upload static files. At the moment a VPS can be as cheap as five euros a month.
+* If, when buying a VPS, you can choose between a pre-installed or ISO-VPS, choose the ISO-VPS, i.e. choose the option with the most freedom (avoid 'time-saving' options).
+* For this tutorial we will assume you have chosen the latest Ubuntu version, this tutorial is tested with Ubuntu 16.04.
 * If you don't have a domain yet, you can probably buy it via the same company as you bought the VPS. If you have one, you can probably transfer the management of it to that company. You could also leave it as you have it, and just point the DNS to the ip address of the VPS.
 
 From now on we assume that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash or using Pycharm.
