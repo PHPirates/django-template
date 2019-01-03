@@ -150,19 +150,22 @@ then the previous steps could be the problem (or your firewall is still blocking
 
 ## Setting up nginx
 * Install with `sudo apt-get install nginx`
-* Edit the content of the  [`nginx-config`](server%20configuration%20files/nginx-config) into `sudo nano /etc/nginx/sites-available/mysite/nginx-config`. We will set up https later.
+* Edit the content of the  [`nginx-config`](server%20configuration%20files/nginx-config) into the file `sudo nano /etc/nginx/sites-available/mysite`. We will set up https later.
 * Enable your site by making the symbolic link `sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/mysite`
 * Remove the symbolic link to the default config, `sudo rm /etc/nginx/sites-available/default`
 * Create empty log file `mkdir /opt/mysite_env/mysite/logs/` and `touch /opt/mysite_env/mysite/logs/nginx-access.log`.
 * Make the socket directory with `mkdir /opt/mysite_env/mysite/run/`.
-* If at any time you get some error that the socket does not exist, create an empty socket file `/opt/mysite_env/mysite/run/gunicorn.sock` in the same way. If at any time you get the error that this is not a socket, remove it. A socket is just a text file, with the great usefulness of enabling nginx to talk to gunicorn in a language that they both understand.
+* Create an empty socket file `touch /opt/mysite_env/mysite/run/gunicorn.sock` in the same way. If at any time you get the error that this is not a socket, remove it. A socket is just a text file, with the great usefulness of enabling nginx to talk to gunicorn in a language that they both understand.
 * Make sure the lines in the nginx config which point to the ssl certificates are commented.
 * Test the syntax of your nginx config file with `sudo nginx -t` and fix any.
 
+* Make sure you have your ip and domain (without the `http(s)://` prefix) in allowed hosts in your Django settings file.
+
 Now go in your browser to your ip address or domain and you should see your website.
+If not, check the logs for errors (see [below](#remember)).
 
 ## Setting up HTTPS
-Because it's not much work and free, just do it.
+Because it's not much work and free, just do it. You need to have your domain pointing to your ip address already.
 
 * You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx). If you need to choose, you are not serving files out of a directory on the server. 
 * Uncomment the https-related parts in the `nginx-config`, marked with `# ---- HTTPS setup start/end ----`, and remove the `listen 80;` line.
@@ -182,7 +185,11 @@ After making changes to Django models, in PyCharm start Tools | Run Manage.py Ta
 After making changes to static files run as manage.py task `collectstatic`. If run from the command line, I think you need to activate the virtual environment first.
 ### Supervisor config
 Every time after you change a supervisor config file in `/etc/supervisor/conf.d/mysite.conf`, you have to do `sudo supervisorctl reread` and `sudo supervisorctl update`.
+### gunicorn start script
+Restart supervisor with `sudo supervisorctl restart mysite`.
 ### nginx config
 After changing nginx config files in `/etc/nginx/sites-available/mysite`, test syntax with `sudo nginx -t` and run `sudo service nginx restart`.
 ### logs
-nginx logs are viewed with `tail /var/log/long.err.log` or `tail /var/log/long.out.log`, or `tail /opt/mysite_env/mysite/logs/nginx-error.log` as specified in the nginx config file.
+General logs are viewed with `tail /var/log/long.err.log` or `tail /var/log/long.out.log`, and the nginx log can be found with `tail /opt/mysite_env/mysite/logs/nginx-error.log` as specified in the nginx config file.
+
+If you get an error and nothing appears in the logs, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
