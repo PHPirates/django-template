@@ -108,8 +108,9 @@ then the previous steps could be the problem (or your firewall is still blocking
 
 
 ## Setting up a virtual environment
-* Back on the server, update pip with `pip3 install --upgrade pip`. 
-* Check that you're running the python 3 version of pip with `pip -V`
+* Check that you're running the python 3 version of pip with `pip -V`.
+* If not, try `pip3 -V`. If that works, you have to substitute `pip` with `pip3` from now on.
+* Similarly, check if you're using python 3 with `python -V`, and if you need `python3` then substitute, or do something else to fix it.
 * Ensure ownership of python to install packages with `sudo chown -R eve:eve /usr/local`.
 * Install the package with `pip install virtualenv`.
 * I happen to want my virtual environments in `/opt/` so I do `cd /opt`.
@@ -124,41 +125,48 @@ then the previous steps could be the problem (or your firewall is still blocking
 
 ## Uploading project and installing dependencies
 * `cd mysite_env` and `sudo mkdir mysite`, then correct ownership with `sudo chown -R eve:eve /opt/`.
-* In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. Under Options you can specify to upload changes automatically or if you hit `CTRL+S`.
-* Select your project folder in the PyCharm project view and try to upload your files with `CTRL+S` (if you chose that option) or Tools | Deployment | Upload to ...
-* If you succeeded, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
-* If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings | Project Interpreter and add a new remote one, selecting Deployment Configuration and Move Deployment Server, then select the right path to your python.
+* In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. 
+* Under Options (click on the arrow next to Deployment on the left) you can specify to upload changes automatically or if you hit `CTRL+S`.
+* Select all the files and folders you want to upload (probably everything except any local virtual environment) in the PyCharm project view and try to upload your files with `CTRL+S` (if you chose that option) or if that doesn't work, try Tools | Deployment | Upload to ...
+* If you need `msqlclient`, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
+* If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings | Project Interpreter and add a new remote one, selecting SSH Interpreter, then Existing Server Configuration, select as Deployment Configuration your server and Move Deployment Server, then select the right path to your python _of the virtual environment_.
 * PyCharm should warn you about some dependencies from requirements.txt not being installed, do that. Probably PyCharm will also install helper files which can take a long time.
 * Make sure you have the remote python selected as interpreter, (you can also check for package updates there), now you can just like before hit Tools | Run Manage.py Task and run `makemigrations` and `migrate` but now both with production settings: so `makemigrations --settings=mysite.settings.production` and also for `migrate`.
+* If that fails, try running these tasks manually, so go to `/opt/mysite_env/mysite` and run `python manage.py makemigrations` and same for `migrate`.
 * If needed, create superuser just as with local setup, `createsuperuser --username myname`.
-* Run `collectstatic --settings=mysite.settings.production` to gather static files for nginx to serve.
+* Run the manage.py task `collectstatic --settings=mysite.settings.production` to gather static files for nginx to serve.
+* Double-check that Deployment Settings | Mappings | Deployment Path is set to `/`, PyCharm sometimes resets this. If this is wrong, uploading files won't work properly. 
 
 ## Setting up gunicorn
 * We will setup gunicorn such that nginx will be able to redirect requests to gunicorn which is bound to the Django server.
-* Put the `gunicorn_start` script in `/opt/mysite_env/bin/` (after changing all the paths, of course), make sure it has executable permissions: create file with `nano /opt/mysite_env/bin/gunicorn_start` (do not use sudo or FileZilla here) and `sudo chmod u+x /opt/mysite_env/bin/gunicorn_start`.
+* Copy the contents of the [`gunicorn_start`](server%20configuration%20files/gunicorn_start) script in `/opt/mysite_env/bin/` (after changing all the paths, of course), create file with `nano /opt/mysite_env/bin/gunicorn_start` (do not use sudo or FileZilla here) and make sure it has executable permissions with `sudo chmod u+x /opt/mysite_env/bin/gunicorn_start`.
 
 ## Setting up supervisor
 * We use supervisor to manage the starting and stopping of gunicorn. If your server would crash or for whatever reason is restarted, this makes sure to automatically start your website too.
-* Install with `sudo apt-get install supervisor`.
-* Put the file `mysite.conf` in `sudo nano /etc/supervisor/conf.d/mysite.conf`.
-* Every time after you change such a supervisor config file, you have to do `sudo supervisorctl reread` and `sudo supervisorctl update`. I gathered things to remember like this [below](#remember).
+* Install with `sudo apmake sure it has executable permissions: t-get install supervisor`.
+* Put the file [`mysite.conf`](server%20configuration%20files/mysite.conf) in `sudo nano /etc/supervisor/conf.d/mysite.conf`.
+* Every time after you change such a supervisor config file, you have to do `sudo supervisorctl reread` and `sudo supervisorctl update`. Do this now. I gathered things to remember like this [below](#remember).
 * You can manually restart with `sudo supervisorctl restart mysite`.
 
 ## Setting up nginx
 * Install with `sudo apt-get install nginx`
-* Edit the content of nginx-config into `sudo nano /etc/nginx/sites-available/mysite`.
+* Edit the content of the  [`nginx-config`](server%20configuration%20files/nginx-config) into `sudo nano /etc/nginx/sites-available/mysite/nginx-config`. We will set up https later.
 * Enable your site by making the symbolic link `sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/mysite`
-* Remove the symbolic link to the default config, `rm /etc/nginx/sites-enabled/default`
+* Remove the symbolic link to the default config, `sudo rm /etc/nginx/sites-available/default`
 * Create empty log file `mkdir /opt/mysite_env/mysite/logs/` and `touch /opt/mysite_env/mysite/logs/nginx-access.log`.
 * Make the socket directory with `mkdir /opt/mysite_env/mysite/run/`.
 * If at any time you get some error that the socket does not exist, create an empty socket file `/opt/mysite_env/mysite/run/gunicorn.sock` in the same way. If at any time you get the error that this is not a socket, remove it. A socket is just a text file, with the great usefulness of enabling nginx to talk to gunicorn in a language that they both understand.
 * Make sure the lines in the nginx config which point to the ssl certificates are commented.
 * Test the syntax of your nginx config file with `sudo nginx -t` and fix any.
 
+Now go in your browser to your ip address or domain and you should see your website.
+
 ## Setting up HTTPS
 Because it's not much work and free, just do it.
 
-* You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx). If you need to choose, you are not serving files out of a directory on the server. Also, it's possible that after running certbot it has automatically added lines in the nginx config which point to the ssl certificates (multiple times!). You probably want to replace the old lines you commented out previously with these ones.
+* You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx). If you need to choose, you are not serving files out of a directory on the server. 
+* Uncomment the https-related parts in the `nginx-config`, marked with `# ---- HTTPS setup start/end ----`, and remove the `listen 80;` line.
+* Also, it's possible that after running certbot it has automatically added lines in the nginx config which point to the ssl certificates (multiple times!). You probably want to replace the old lines you commented out previously with these ones.
 * Possibly you need to `sudo fuser -k 80/tcp` to clean things up after setting up https. 
 * Then start nginx with `sudo service nginx start`.
 * In the future, restart nginx with `sudo service nginx restart`. 
