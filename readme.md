@@ -28,8 +28,8 @@
  To create a user, right-click on PostgreSQL and choose create Login/Group Role, give it for example the name of your project.
   Create a database by right-clicking on Databases, give it a name for example myproject_db, and under the 'security' tab grant all privileges to the user you just created.
 * Replace name, user and password in `DATABASES` in your settings file.
-* Use edit - find - replace in path to replace all references to 'mysite' to our own project name. Also rename the 'mysite' module (take care to be consistent with capitalization).
-* (Professional edition of PyCharm only) To run `manage.py` tasks, go to settings - Languages and Frameworks - Django and specify your settings file (in this case development, which includes base). Then you can use Tools - Run manage.py Task (`CTRL` + `ALT` + `R`) to run tasks like `migrate`.
+* Use edit | find | replace in path to replace all references to 'mysite' to our own project name. Also rename the 'mysite' module (take care to be consistent with capitalization).
+* (Professional edition of PyCharm only) To run `manage.py` tasks, go to settings | Languages and Frameworks | Django and specify your settings file (in this case development, which includes base). Then you can use Tools | Run manage.py Task (`CTRL` + `ALT` + `R`) to run tasks like `migrate`.
 * Each time after you made changes in your models in models.py, run `makemigrations` and `migrate` to apply the changes to the database. Do that now.
 * Also as `manage.py` task, run `createsuperuser --username myname` to create a superuser (for example you) for your website backend.
 * Use the run configuration you made or run `runserver`.
@@ -46,32 +46,34 @@ It makes life easier if you also use **PyCharm**, and **supervisor** to manage g
 
 * You will want to buy a VPS, which is a (virtual) server on which you can install whatever you want. Make sure not to buy something called 'shared hosting' as it probably means you can only upload static files. At the moment a VPS can be as cheap as five euros a month.
 * If, when buying a VPS, you can choose between a pre-installed or ISO-VPS, choose the ISO-VPS, i.e. choose the option with the most freedom (avoid 'time-saving' options).
-* For this tutorial we will assume you have chosen the latest Ubuntu version, this tutorial is tested with Ubuntu 16.04.
+* For this tutorial we will assume you have chosen the latest Ubuntu version, this tutorial is tested with Ubuntu 16.04 and 18.04.
 * If you don't have a domain yet, you can probably buy it via the same company as you bought the VPS. If you have one, you can probably transfer the management of it to that company. You could also leave it as you have it, and just point the DNS to the ip address of the VPS.
 
-From now on we assume that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash or using Pycharm.
+From now on we assume that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash.
+If not, for example because you have walked through the Ubuntu installation yourself, make sure you install `openssh-server` (with `sudo apt-get install openssh-server`).
+If you cannot access because you have no root password, you should have created an other user, say `eve`.
+Then you should be able to login with `eve` instead of `root`.
 
-Just in case, run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
+Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 
 ## Setting up users and login
 
-* Log in via SSH with the root user. Make a new user with your name with `adduser eve`. Give her root permissions with `usermod -aG sudo eve`.
-* Impersonate her with `sudo su - eve`.
-* Set up login with a key pair, if needed on your local computer generate keys. View your public key with `cat ~/.ssh/id_rsa.pub` and copy it.
-* To put it on the server, use `mkdir ~/.ssh`, `chmod 700 ~/.ssh`, `nano ~/.ssh/authorized_keys` and `chmod 600 ~/.ssh/authorized_keys`.
+* If you already have a second user besides root, skip this step. Otherwise, log in via SSH with the root user. Create a new user with your name with `adduser eve`. Give her root permissions with `usermod -aG sudo eve`. Impersonate her with `sudo su - eve`.
+* Set up login with a key pair, if needed on your local computer generate keys, otherwise reuse the key you have. View your public key by executing (locally) in bash `cat ~/.ssh/id_rsa.pub` and copy it.
+* To put it on the server, use `mkdir ~/.ssh`, `chmod 700 ~/.ssh`, `nano ~/.ssh/authorized_keys` to put the key in this file and `chmod 600 ~/.ssh/authorized_keys`.
 * Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
-* Install a text editor, for example `sudo apt-get install nano`.
 * Install a firewall, `sudo apt-get install ufw`.
-* Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx`.
+* Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx` where `xxx` is a port number.
 * `sudo ufw enable` and check with `sudo ufw status`.
+* Before closing your existing connection to the server, check if you can login to a new session! Otherwise you could lock yourself out.
 
 ## Local setup
-* Add your server to PyCharm in Settings - Build, Execution, Deployment - Deployment, click on the plus icon, choose SFTP, enter the IP address of your server in SFTP host, specify user name and your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also, if not already done, specify web server root url as `http://ipadress`.
-* Make the server the default one by clicking an icon a few to the right of the 'plus' you used to add the server.
-* Go to Settings - Tools - SSH Terminal and select the server as Deployment server.
-* You should now be able to ssh into your server with Tools - Start SSH Session (assigning a shortcut to this is a good idea).
+* Add your server to PyCharm in Settings | Build, Execution, Deployment | Deployment, click on the plus icon, choose SFTP, enter the IP address of your server in SFTP host, specify user name, choose as authentication Key Pair and specify your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also, if not already done, specify web server url as `http://ipadress`.
+* Make the server the default one by clicking an icon a few to the right of the 'plus' you used to add the server. When the server name becomes bold, you have set it as default.
+* Go to Settings | Tools | SSH Terminal and select the server as Deployment server.
+* You should now be able to ssh into your server with Tools | Start SSH Session (assigning a shortcut to this is a good idea).
 
-* If needed point your (sub)domain to the ip address of your server, probably in the settings of the provider where you registered the domains. This can take a few hours to take effect.
+* If needed (and if you already want your website domain to point to this VPS) point your (sub)domain to the ip address of your server, probably in the settings of the provider where you registered the domains. This can take a few hours to take effect.
 
 * Install the packages we need with `sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx`.
 
@@ -123,11 +125,11 @@ then the previous steps could be the problem (or your firewall is still blocking
 ## Uploading project and installing dependencies
 * `cd mysite_env` and `sudo mkdir mysite`, then correct ownership with `sudo chown -R eve:eve /opt/`.
 * In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. Under Options you can specify to upload changes automatically or if you hit `CTRL+S`.
-* Select your project folder in the PyCharm project view and try to upload your files with `CTRL+S` (if you chose that option) or Tools - Deployment - Upload to ...
+* Select your project folder in the PyCharm project view and try to upload your files with `CTRL+S` (if you chose that option) or Tools | Deployment | Upload to ...
 * If you succeeded, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
-* If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings - Project Interpreter and add a new remote one, selecting Deployment Configuration and Move Deployment Server, then select the right path to your python.
+* If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings | Project Interpreter and add a new remote one, selecting Deployment Configuration and Move Deployment Server, then select the right path to your python.
 * PyCharm should warn you about some dependencies from requirements.txt not being installed, do that. Probably PyCharm will also install helper files which can take a long time.
-* Make sure you have the remote python selected as interpreter, (you can also check for package updates there), now you can just like before hit Tools - Run Manage.py Task and run `makemigrations` and `migrate` but now both with production settings: so `makemigrations --settings=mysite.settings.production` and also for `migrate`.
+* Make sure you have the remote python selected as interpreter, (you can also check for package updates there), now you can just like before hit Tools | Run Manage.py Task and run `makemigrations` and `migrate` but now both with production settings: so `makemigrations --settings=mysite.settings.production` and also for `migrate`.
 * If needed, create superuser just as with local setup, `createsuperuser --username myname`.
 * Run `collectstatic --settings=mysite.settings.production` to gather static files for nginx to serve.
 
@@ -167,7 +169,7 @@ Because it's not much work and free, just do it.
 ### Django files
 After making changes to Django files, run `sudo supervisorctl restart mysite`.
 ### Django models
-After making changes to Django models, in PyCharm start Tools - Run Manage.py Task  and run `makemigrations --settings=mysite.settings.production` and `migrate --settings=mysite.settings.production` (or from the command line, `python3.6 manage.py makemigrations --settings=...`)
+After making changes to Django models, in PyCharm start Tools | Run Manage.py Task  and run `makemigrations --settings=mysite.settings.production` and `migrate --settings=mysite.settings.production` (or from the command line, `python3.6 manage.py makemigrations --settings=...`)
 ### Static files
 After making changes to static files run as manage.py task `collectstatic`. If run from the command line, I think you need to activate the virtual environment first.
 ### Supervisor config
