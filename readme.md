@@ -159,7 +159,7 @@ then the previous steps could be the problem (or your firewall is still blocking
 * Make sure the lines in the nginx config which point to the ssl certificates are commented.
 * Test the syntax of your nginx config file with `sudo nginx -t` and fix any.
 
-* Make sure you have your ip and domain (without the `http(s)://` prefix) in allowed hosts in your Django settings file.
+* Make sure you have your ip and domain (without the `http(s)://` prefix, but both with and without the `www.` prefix) in allowed hosts in your Django settings file.
 
 Now go in your browser to your ip address or domain and you should see your website.
 If not, check the logs for errors (see [below](#remember)).
@@ -167,14 +167,20 @@ If not, check the logs for errors (see [below](#remember)).
 ## Setting up HTTPS
 Because it's not much work and free, just do it. You need to have your domain pointing to your ip address already.
 
-* You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx). If you need to choose, you are not serving files out of a directory on the server. 
-* Uncomment the https-related parts in the `nginx-config`, marked with `# ---- HTTPS setup start/end ----`, and remove the `listen 80;` line.
-* Also, it's possible that after running certbot it has automatically added lines in the nginx config which point to the ssl certificates (multiple times!). You probably want to replace the old lines you commented out previously with these ones.
+* You can get an ssl certificate for free, for example from Let's Encrypt. In that case, just follow their [install guide](https://certbot.eff.org/#ubuntuxenial-nginx). 
+* When running certbot, when it asks for domains provide it both with and without the `www.` prefix. If you need to choose, you are not serving files out of a directory on the server. 
+* Either choose in the certbot setup to redirect http to https (in which case you need to add your domain without `www.` prefix to `server_name` in the largest `server ` block) or do this yourself by uncommenting the https-related parts in the `nginx-config`, marked with `# ---- HTTPS setup start/end ----`, and remove the `listen 80;` line.
+* In any case, make sure the main server block has only one `listen ...` line, one `server_name ...` line etc.
 * Possibly you need to `sudo fuser -k 80/tcp` to clean things up after setting up https. 
 * Then start nginx with `sudo service nginx start`.
 * In the future, restart nginx with `sudo service nginx restart`. 
 * In case that fails, check the logs at `tail /var/log/long.err.log` or `tail /var/log/long.out.log` to view the error.
 * Try to reach your website. If it doesn't work, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
+
+### Setting up automatic renewal
+
+* To renew certificates manually, do `sudo certbot renew`.
+<!-- todo -->
 
 ## <a name="remember">To remember</a>
 ### Django files
