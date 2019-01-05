@@ -178,9 +178,11 @@ Because it's not much work and free, just do it. You need to have your domain po
 * Try to reach your website. If it doesn't work, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
 
 ### Setting up automatic renewal
+* Check the [certbot user guide](https://certbot.eff.org/docs/using.html#automated-renewals) to see if you got automated renewal out of the box. For Ubuntu version >= 17.10, this should be okay. This means that there is a cronjob that runs twice a day to renew all certificates that are about to expire. All we have to do is restart the nginx server after each renewal.
+* Run `sudo vim /etc/cron.d/certbot` and append `--renew-hook "service nginx restart"` so that the last line looks like `0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system && perl -e 'sleep int(rand(43200))' && certbot -q renew --renew-hook "service nginx restart`.
+* Run `sudo certbot renew --dry-run`, this should simulate renewal. If this succeeds without errors, everything should be okay.
 
-* To renew certificates manually, do `sudo certbot renew`.
-<!-- todo -->
+To renew certificates manually, do `sudo certbot renew`.
 
 ## <a name="remember">To remember</a>
 ### Django files
