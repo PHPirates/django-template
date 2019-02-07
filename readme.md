@@ -20,14 +20,28 @@
 
 * Create a project, and download the files to that location.
 * Probably you want to use a virtual environment.
-* Check that the packages in requirements.txt are installed, you may need to download the `mysqlclient` package from [lfd.uci.edu](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysql-python) selecting the 32 bits version for the right python version (even when you are on 64 bit), copy it to the project location and then run `pip install mysqlclient-1.3.13-cp37-cp37m-win32.whl`.
+* Check that the packages in requirements.txt are installed, on Windows you may need to download the `mysqlclient` package from [lfd.uci.edu](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysql-python) selecting the 32 bits version for the right python version (even when you are on 64 bit), copy it to the project location and then run `pip install mysqlclient-1.3.13-cp37-cp37m-win32.whl`. On Linux you can download a `mysqlclient` package from your distro's package repo, you also need `gcc`.
 * If you use PyCharm, you can make a Django Server run configuration (instead of running `runserver` all the time). Add an environment variable with name `DJANGO_SETTINGS_MODULE` and value `mysite.settings.development`, assuming the settings are in `development.py` in a folder `settings` in the folder `mysite`. The development settings are for development on your local computer, production settings are for production on the server.
 * Tip: If you try running with `DEBUG=False` on your local computer, Django won't serve your static files for you since this is only meant for in production.
 * Possibly you need to select your Python interpreter.
-* To use a database locally, install PostgreSQL and create a user and then a database; you can use pgAdmin (instructions for pgAdmin 4 2.0) instead of the command prompt to create a user.
- To create a user, right-click on PostgreSQL and choose create Login/Group Role, give it for example the name of your project.
-  Create a database by right-clicking on Databases, give it a name for example myproject_db, and under the 'security' tab grant all privileges to the user you just created.
-* Replace name, user and password in `DATABASES` in your settings file.
+* To use a database locally, do the following. On Linux you can also not use pgAdmin but do everything via the command line, just continue to set up postgres like below and then go the instructions linked there.
+   * Install PostgreSQL (go to the website on Windows, use your package manager on Linux) 
+   * Install pgAdmin (these instructions were tested on Windows with pgAdmin 4 2.0 and on Arch Linux with pgAdmin 4 4.1) or use the command prompt PostgreSQL tools for the next steps
+   * On Windows:
+       * To create a user, right-click on PostgreSQL and choose create Login/Group Role, give it for example the name of your project.
+       * Create a database by right-clicking on Databases, give it a name for example myproject_db, and under the 'security' tab grant all privileges to the user you just created.
+   * On Linux (tested on Arch Linux, on other distros commands may differ)
+        * Switch to the postgres user with `sudo su postgres`
+        * Initialize postgres with `initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'`
+        * Switch back to your own user (or open a new terminal window)
+        * Start the postgresql service with `sudo systemctl start postgresql` and `sudo systemctl enable postgresql`
+        * Change to a directory which `psql` can access, like `cd /tmp`
+        * Either use pgAdmin see first part of the [postgres section](#postgres) below (until you exit psql) or do the following.
+        * Create a server with a name like `mysite_server` and host name `127.0.0.1` and user postgres, empty password.
+       * Right click on Login/Group Roles and Create a Role, name it something like `mysite_user` and under Privileges give it the login privilege.
+       * Create a database by right-clicking on Databases, give it a name for example myproject_db, select as owner mysite_user and under the 'security' tab add a privilege with grantee mysite_user, grant all privileges to the user you just created.
+   * Replace name, user and password in `DATABASES` in your settings file.
+   
 * Use edit | find | replace in path to replace all references to 'mysite' to our own project name. Also rename the 'mysite' module (take care to be consistent with capitalization).
 * (Professional edition of PyCharm only) To run `manage.py` tasks, go to settings | Languages and Frameworks | Django and specify your settings file (in this case development, which includes base). Then you can use Tools | Run manage.py Task (`CTRL` + `ALT` + `R`) to run tasks like `migrate`.
 * Each time after you made changes in your models in models.py, run `makemigrations` and `migrate` to apply the changes to the database. Do that now.
@@ -77,14 +91,14 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 
 * Install the packages we need with `sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx`.
 
-## Setting up postgres
+## <a name="postgres">Setting up postgres</a>
 * Start a postgres session with `sudo -u postgres psql`.
 * `CREATE DATABASE mysite_db;`
 * `CREATE USER mysite WITH PASSWORD '1234';`
 * `ALTER ROLE mysite SET client_encoding TO 'utf8';`
 * `ALTER ROLE mysite SET default_transaction_isolation TO 'read committed';`
 * Now check if the timezone in `settings/base.py` is correct, if not you can modify it to for example `Europe/Amsterdam`. Then `ALTER ROLE mysite SET timezone TO 'Europe/Amsterdam';`
-* `GRANT ALL PRIVILEGES ON DATABASE mysite_db to mysite;`
+* `GRANT ALL PRIVILEGES ON DATABASE mysite_db TO mysite;`
 * `\q` to exit
 * Update the production database settings in `mysite/settings/production.py`
 * Generate a new secret key to enter in the same file. For example using PyCharm's Python console with
