@@ -100,12 +100,12 @@ USE_TZ = True
 
 # Place where the static files will end up after collectstatic.
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# Place where static files will be served on you website, http://website.com/STATIC_URL/app/style.css for example.
+# Place where static files will be served on your website, http://website.com/STATIC_URL/app/style.css for example.
 # In production this will be replaced by the NGINX config file
 STATIC_URL = '/static/'
 
-# the list of folder where Django will search for additional static files, in addition to each static folder of each
-# app installed.
+# A list of folders where Django will search for additional static files, in addition to
+# each static folder of each app installed.
 STATICFILES_DIRS = [
 ]
 

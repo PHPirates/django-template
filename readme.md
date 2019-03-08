@@ -18,9 +18,9 @@
 
 # Instructions to run the website locally
 
-* Create a project, and download the files to that location.
+* Create a project either by creating a new Django project in PyCharm and then copying the files from this project or by downloading this template project directly.
 * Probably you want to use a virtual environment.
-* Check that the packages in requirements.txt are installed, on Windows you may need to download the `mysqlclient` package from [lfd.uci.edu](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysql-python) selecting the 32 bits version for the right python version (even when you are on 64 bit), copy it to the project location and then run `pip install mysqlclient-1.3.13-cp37-cp37m-win32.whl`. On Linux you can download a `mysqlclient` package from your distro's package repo, you also need `gcc`.
+* Check that the packages in requirements.txt are installed, on Windows you may need to download the `mysqlclient` package from [lfd.uci.edu](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysql-python) selecting the right bits version for you python (you can check that by starting ``python``), copy it to the project location, check there with `pip -V` that you are using the pip of the virtual environment and then run `pip install mysqlclient-1.3.13-cp37-cp37m-win32.whl`. On Linux you can download a `mysqlclient` package from your distro's package repo, you also need `gcc`.
 * If you use PyCharm, you can make a Django Server run configuration (instead of running `runserver` all the time). Add an environment variable with name `DJANGO_SETTINGS_MODULE` and value `mysite.settings.development`, assuming the settings are in `development.py` in a folder `settings` in the folder `mysite`. The development settings are for development on your local computer, production settings are for production on the server.
 * Tip: If you try running with `DEBUG=False` on your local computer, Django won't serve your static files for you since this is only meant for in production.
 * Possibly you need to select your Python interpreter.
