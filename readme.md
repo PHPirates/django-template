@@ -72,9 +72,9 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 
 ## Setting up users and login
 
-* If you already have a second user besides root, skip this step. Otherwise, log in via SSH with the root user. Create a new user with your name with `adduser eve`. Give her root permissions with `usermod -aG sudo eve`. Impersonate her with `sudo su - eve`.
-* Set up login with a key pair, if needed on your local computer generate keys, otherwise reuse the key you have. View your public key by executing (locally) in bash `cat ~/.ssh/id_rsa.pub` and copy it.
-* To put it on the server, use `mkdir ~/.ssh`, `chmod 700 ~/.ssh`, `nano ~/.ssh/authorized_keys` to put the key in this file and `chmod 600 ~/.ssh/authorized_keys`.
+* If you already have a second user besides root, skip this step. Otherwise, log in via SSH with the root user. Create a new user with your name with `adduser eve`. Give her root permissions with `usermod -aG sudo eve`. Impersonate her with `sudo su - eve`. Note you have to do this and the next three instructions (adding a public key) for every user you want to give access to the server.
+* Set up login with a key pair, if needed on your local computer generate keys, otherwise reuse the key you have. View your public key by executing (locally) in bash `cat ~/.ssh/id_rsa.pub` and copy *all* of the output. 
+* To put it on the server, use `mkdir ~/.ssh` to create the directory, `chmod 700 ~/.ssh` to change permissions, `nano ~/.ssh/authorized_keys` (nano is a text editor, you can also use vim) to put the key in this file and `chmod 600 ~/.ssh/authorized_keys`.
 * Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
 * Install a firewall, `sudo apt-get install ufw`.
 * Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx` where `xxx` is a port number.
@@ -122,9 +122,9 @@ then the previous steps could be the problem (or your firewall is still blocking
 
 
 ## Setting up a virtual environment
-* Check that you're running the python 3 version of pip with `pip -V`.
-* If not, try `pip3 -V`. If that works, you have to substitute `pip` with `pip3` from now on.
+* Check that you're running the python 3 version of pip with `pip -V`. If not, try `pip3 -V`. If that works, you have to substitute `pip` with `pip3` from now on.
 * Similarly, check if you're using python 3 with `python -V`, and if you need `python3` then substitute, or do something else to fix it.
+* If you need Python 3.7 you can follow instructions at https://serverfault.com/a/919064/437404 because this will also install pip. Now you will need to use `python3.7` and `pip3.7` instead of `python` and `pip` in any command. Do not remote the default installed python 3.5.
 * Ensure ownership of python to install packages with `sudo chown -R eve:eve /usr/local`.
 * Install the package with `pip install virtualenv`.
 * I happen to want my virtual environments in `/opt/` so I do `cd /opt`.
@@ -132,7 +132,7 @@ then the previous steps could be the problem (or your firewall is still blocking
 * Install venv with `sudo apt-get install python3-venv`.
 * I had python 3.5 installed, checked with `python3.5 -V`. Then you should be able to create a virtual environment with `sudo python3.5 -m venv mysite_env`.
 * If that does not work, I once solved that under python 3.6 by doing `sudo python3.6 -m venv --without-pip mysite_env`, `source mysite_env/bin/activate`, `sudo apt-get install curl`, then found out curl doesn't run as sudo so did `sudo bash -c "curl https://bootstrap.pypa.io/get-pip.py | python"` then `deactivate`. 
-* Every time you want to do something in your virtual environment, activate it with `source mysite_env/bin/activate`. Do so, now.
+* Every time you want to do something in your virtual environment, activate it with (change `mysite` to your website name) `source mysite_env/bin/activate`. Do so, now.
 * Check with `python -V` for correct python version.
 * If you did set the virtual environment up without pip, download it with `wget https://bootstrap.pypa.io/get-pip.py`, install with `python3.6 get-pip.py`. 
 * Check with `which pip` and `which python` that everything points inside your virtual environment. If you do need to use for example python3.6 instead of python, remember that or fix the `python` command to avoid mistakes.
@@ -140,10 +140,11 @@ then the previous steps could be the problem (or your firewall is still blocking
 ## Uploading project and installing dependencies
 * `cd mysite_env` and `sudo mkdir mysite`, then correct ownership with `sudo chown -R eve:eve /opt/`.
 * In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. 
-* Under Options (click on the arrow next to Deployment on the left) you can specify to upload changes automatically or if you hit `CTRL+S`.
-* Select all the files and folders you want to upload (probably everything except any local virtual environment) in the PyCharm project view and try to upload your files with `CTRL+S` (if you chose that option) or if that doesn't work, try Tools | Deployment | Upload to ...
+* Under Options (click on the arrow next to Deployment in the left menu) you can specify to upload changes automatically or if you hit `CTRL+S`. Click Ok.
+* Select in the PyCharm project view on the left all the files and folders you want to upload (probably everything except any local virtual environment) and try to upload your files with `CTRL+S` (if you chose that option) or if that doesn't work, try Tools | Deployment | Upload to ...
 * If you need `msqlclient`, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
-* If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings | Project Interpreter and add a new remote one, selecting SSH Interpreter, then Existing Server Configuration, select as Deployment Configuration your server and Move Deployment Server, then select the right path to your python _of the virtual environment_.
+* If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings | Project ... | Project Interpreter and add a new remote one by selecting the gear icon at the top right.
+* Select SSH Interpreter in the left menu, then Existing Server Configuration, select as Deployment Configuration your server and Move Deployment Server, then select the right path to your python _of the virtual environment_.
 * PyCharm should warn you about some dependencies from requirements.txt not being installed, do that. Probably PyCharm will also install helper files which can take a long time.
 * Make sure you have the remote python selected as interpreter, (you can also check for package updates there), now you can just like before hit Tools | Run Manage.py Task and run `makemigrations` and `migrate` but now both with production settings: so `makemigrations --settings=mysite.settings.production` and also for `migrate`.
 * If that fails, try running these tasks manually, so go to `/opt/mysite_env/mysite` and run `python manage.py makemigrations` and same for `migrate`.
@@ -157,8 +158,8 @@ then the previous steps could be the problem (or your firewall is still blocking
 
 ## Setting up supervisor
 * We use supervisor to manage the starting and stopping of gunicorn. If your server would crash or for whatever reason is restarted, this makes sure to automatically start your website too.
-* Install with `sudo apmake sure it has executable permissions: t-get install supervisor`.
-* Put the file [`mysite.conf`](server%20configuration%20files/mysite.conf) in `sudo nano /etc/supervisor/conf.d/mysite.conf`.
+* Install with `sudo apt-get install supervisor`.
+* Put the file [`mysite.conf`](server%20configuration%20files/mysite.conf) in `sudo nano /etc/supervisor/conf.d/mysite.conf`, make sure it has executable permissions just like with the gunicorn start script.
 * Every time after you change such a supervisor config file, you have to do `sudo supervisorctl reread` and `sudo supervisorctl update`. Do this now. I gathered things to remember like this [below](#remember).
 * You can manually restart with `sudo supervisorctl restart mysite`.
 
@@ -166,17 +167,15 @@ then the previous steps could be the problem (or your firewall is still blocking
 * Install with `sudo apt-get install nginx`
 * Edit the content of the  [`nginx-config`](server%20configuration%20files/nginx-config) into the file `sudo nano /etc/nginx/sites-available/mysite`. We will set up https later.
 * Enable your site by making the symbolic link `sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/mysite`
-* Remove the symbolic link to the default config, `sudo rm /etc/nginx/sites-available/default`
+* Remove the symbolic link to the default config, `sudo rm /etc/nginx/sites-available/default` and `sudo rm /etc/nginx/sites-enabled/default`
 * Create empty log file `mkdir /opt/mysite_env/mysite/logs/` and `touch /opt/mysite_env/mysite/logs/nginx-access.log`.
 * Make the socket directory with `mkdir /opt/mysite_env/mysite/run/`.
-* Create an empty socket file `touch /opt/mysite_env/mysite/run/gunicorn.sock` in the same way. If at any time you get the error that this is not a socket, remove it. A socket is just a text file, with the great usefulness of enabling nginx to talk to gunicorn in a language that they both understand.
+* Create an empty socket file `touch /opt/mysite_env/mysite/run/gunicorn.sock` in the same way, and also `sudo chmod 666 /opt/mysite_env/mysite/run/gunicorn.sock`. If at any time you get the error that this is not a socket, remove it. A socket is just a text file, with the great usefulness of enabling nginx to talk to gunicorn in a language that they both understand.
 * Make sure the lines in the nginx config which point to the ssl certificates are commented.
 * Test the syntax of your nginx config file with `sudo nginx -t` and fix any.
 
 * Make sure you have your ip and domain (without the `http(s)://` prefix, but both with and without the `www.` prefix) in allowed hosts in your Django settings file.
-
-Now go in your browser to your ip address or domain and you should see your website.
-If not, check the logs for errors (see [below](#remember)).
+* If you will set up https later, you can skip the https section below, but make sure to start nginx in the section after that.
 
 ## Setting up HTTPS
 Because it's not much work and free, just do it. You need to have your domain pointing to your ip address already.
@@ -186,12 +185,18 @@ Because it's not much work and free, just do it. You need to have your domain po
 * Either choose in the certbot setup to redirect http to https (in which case you need to add your domain without `www.` prefix to `server_name` in the largest `server ` block) or do this yourself by uncommenting the https-related parts in the `nginx-config`, marked with `# ---- HTTPS setup start/end ----`, and remove the `listen 80;` line.
 * In any case, make sure the main server block has only one `listen ...` line, one `server_name ...` line etc.
 * Possibly you need to `sudo fuser -k 80/tcp` to clean things up after setting up https. 
-* Then start nginx with `sudo service nginx start`.
+
+## Start nginx
+* Start nginx with `sudo service nginx start`.
 * In the future, restart nginx with `sudo service nginx restart`. 
 * In case that fails, check the logs at `tail /var/log/long.err.log` or `tail /var/log/long.out.log` to view the error.
 * Try to reach your website. If it doesn't work, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
+* If it still does not work, restart both nginx (see above) and gunicorn with `sudo supervisorctl restart mysite`
 
-### Setting up automatic renewal
+Now go in your browser to your ip address or domain and you should see your website.
+If not, check the logs for errors (see [below](#remember)).
+
+### Setting up automatic renewal of https certificates
 * Check the [certbot user guide](https://certbot.eff.org/docs/using.html#automated-renewals) to see if you got automated renewal out of the box. For Ubuntu version >= 17.10, this should be okay. This means that there is a cronjob that runs twice a day to renew all certificates that are about to expire. All we have to do is restart the nginx server after each renewal.
 * Run `sudo vim /etc/cron.d/certbot` and append `--renew-hook "service nginx restart"` so that the last line looks like `0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system && perl -e 'sleep int(rand(43200))' && certbot -q renew --renew-hook "service nginx restart`.
 * Run `sudo certbot renew --dry-run`, this should simulate renewal. If this succeeds without errors, everything should be okay.
