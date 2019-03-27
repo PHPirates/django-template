@@ -85,7 +85,7 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 * Add your server to PyCharm in Settings | Build, Execution, Deployment | Deployment, click on the plus icon, choose SFTP, enter the IP address of your server in SFTP host, specify user name, choose as authentication Key Pair and specify your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also, if not already done, specify web server url as `http://ipadress`. If you get the error 'Keypair is corrupt or has unknown format', then try selecting OpenSSH config as Authentication instead.
 * Make the server the default one by clicking an icon a few to the right of the 'plus' you used to add the server. When the server name becomes bold, you have set it as default.
 * Go to Settings | Tools | SSH Terminal and select the server as Deployment server.
-* You should now be able to ssh into your server with Tools | Start SSH Session (assigning a shortcut to this is a good idea).
+* You should now be able to ssh into your server with Tools | Start SSH Session (assigning a shortcut to this is a good idea: go to Settings | Keymap, search for 'start ssh' and add a shortcut, e.g. <kbd>Alt</kbd>+<kbd>S</kbd>).
 
 * If needed (and if you already want your website domain to point to this VPS) point your (sub)domain to the ip address of your server, probably in the settings of the provider where you registered the domains. This can take a few hours to take effect.
 
