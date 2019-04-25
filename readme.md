@@ -25,7 +25,7 @@
 * Tip: If you try running with `DEBUG=False` on your local computer, Django won't serve your static files for you since this is only meant for in production.
 * Possibly you need to select your Python interpreter.
 
-#### Setting up postgres
+#### Setting up postgres locally
 * To use a database locally, do the following. On Linux you can also not use pgAdmin but do everything via the command line, just continue to set up postgres like below and then go the instructions linked there.
    * Install PostgreSQL (go to the website on Windows, use your package manager on Linux) 
    * Install pgAdmin (these instructions were tested on Windows with pgAdmin 4 2.0 and on Arch Linux with pgAdmin 4 4.1) or use the command prompt PostgreSQL tools for the next steps
