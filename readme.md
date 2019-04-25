@@ -24,6 +24,8 @@
 * If you use PyCharm, you can make a Django Server run configuration (instead of running `runserver` all the time). Add an environment variable with name `DJANGO_SETTINGS_MODULE` and value `mysite.settings.development`, assuming the settings are in `development.py` in a folder `settings` in the folder `mysite`. The development settings are for development on your local computer, production settings are for production on the server.
 * Tip: If you try running with `DEBUG=False` on your local computer, Django won't serve your static files for you since this is only meant for in production.
 * Possibly you need to select your Python interpreter.
+
+#### Setting up postgres
 * To use a database locally, do the following. On Linux you can also not use pgAdmin but do everything via the command line, just continue to set up postgres like below and then go the instructions linked there.
    * Install PostgreSQL (go to the website on Windows, use your package manager on Linux) 
    * Install pgAdmin (these instructions were tested on Windows with pgAdmin 4 2.0 and on Arch Linux with pgAdmin 4 4.1) or use the command prompt PostgreSQL tools for the next steps
@@ -36,9 +38,10 @@
         * Switch back to your own user (or open a new terminal window)
         * Start the postgresql service with `sudo systemctl start postgresql` and `sudo systemctl enable postgresql`
         * Change to a directory which `psql` can access, like `cd /tmp`
-        * Either use pgAdmin see first part of the [postgres section](#postgres) below (until you exit psql) or do the following.
+        * Either use pgAdmin, or reuse the way of working from the server: do the first part of the [postgres section](#postgres) below (until you exit psql) now. If you use pgAdmin:
         * Create a server with a name like `mysite_server` and host name `127.0.0.1` and user postgres, empty password.
        * Right click on Login/Group Roles and Create a Role, name it something like `mysite_user` and under Privileges give it the login privilege.
+       * If you get the error `'psycopg2.extensions.Column' object has no attribute '_asdict'` then you have a version mismatch between psycopg2 and pgAdmin, probably psycopg2 is newer than your pgAdmin version (e.g. pgAdmin4 4.4 and psycopg2 2.8.2 will not work). Try updating everything (for newer pgAdmin version you can search online) and if it doesn't help use the command line (link above) to continue.
        * Create a database by right-clicking on Databases, give it a name for example myproject_db, select as owner mysite_user and under the 'security' tab add a privilege with grantee mysite_user, grant all privileges to the user you just created.
    * Replace name, user and password in `DATABASES` in your settings file.
    
@@ -99,6 +102,7 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 * `ALTER ROLE mysite SET default_transaction_isolation TO 'read committed';`
 * Now check if the timezone in `settings/base.py` is correct, if not you can modify it to for example `Europe/Amsterdam`. Then `ALTER ROLE mysite SET timezone TO 'Europe/Amsterdam';`
 * `GRANT ALL PRIVILEGES ON DATABASE mysite_db TO mysite;`
+* If you want to use tests which use the database (recommended, see https://docs.djangoproject.com/en/2.2/topics/testing/overview/) you also need to run `ALTER USER mysite CREATEDB;`
 * `\q` to exit
 * Update the production database settings in `mysite/settings/production.py`
 * Generate a new secret key to enter in the same file. For example using PyCharm's Python console with
