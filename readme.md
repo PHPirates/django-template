@@ -224,3 +224,8 @@ After changing nginx config files in `/etc/nginx/sites-available/mysite`, test s
 General logs are viewed with `tail /var/log/long.err.log` or `tail /var/log/long.out.log`, and the nginx log can be found with `tail /opt/mysite_env/mysite/logs/nginx-error.log` as specified in the nginx config file.
 
 If you get an error and nothing appears in the logs, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
+
+
+# Under test: deployment with Docker
+
+To run the server, run `docker-compose up`.
