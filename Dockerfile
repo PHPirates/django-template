@@ -10,7 +10,7 @@ RUN pip install -r requirements.txt
 
 COPY . /django_template
 
-EXPOSE 8001
+#EXPOSE 8001
 
 # todo Move running commands here?
 # Makemigrations and migrate? Which db?

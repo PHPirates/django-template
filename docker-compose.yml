@@ -3,8 +3,6 @@ version: '3.6'
 services:
   db:
     image: postgres:10.7
-    ports:
-      - 5432:5432
   backend_test:
     build: .
     command: python manage.py runserver 0.0.0.0:8001 --settings=mysite.settings.deployment
