@@ -169,6 +169,12 @@ then the previous steps could be the problem (or your firewall is still blocking
 
 ## Setting up nginx
 * Install with `sudo apt-get install nginx`
+* If you do not have the folders `/etc/nginx/sites-available/` and `/etc/nginx/sites-enabled`, you can create them and you also need to include them by putting in `/etc/nginx/nginx.conf` at the bottom of the `http` block the following:
+```
+include /etc/nginx/conf.d/*.conf;
+include /etc/nginx/sites-enabled/*;
+```
+and remove the `server` block in the `http` block.
 * Edit the content of the  [`nginx-config`](server%20configuration%20files/nginx-config) into the file `sudo nano /etc/nginx/sites-available/mysite`. We will set up https later.
 * Enable your site by making the symbolic link `sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/mysite`
 * Remove the symbolic link to the default config, `sudo rm /etc/nginx/sites-available/default` and `sudo rm /etc/nginx/sites-enabled/default`
@@ -191,7 +197,7 @@ Because it's not much work and free, just do it. You need to have your domain po
 * Possibly you need to `sudo fuser -k 80/tcp` to clean things up after setting up https. 
 
 ## Start nginx
-* Start nginx with `sudo service nginx start`.
+* Start nginx with `sudo service nginx start`. Note that if you get `service: command not found` then whenever this tutorial uses `service` like this you need to use `sudo systemctl start nginx` instead. 
 * In the future, restart nginx with `sudo service nginx restart`. 
 * In case that fails, check the logs at `tail /var/log/long.err.log` or `tail /var/log/long.out.log` to view the error.
 * Try to reach your website. If it doesn't work, try setting `DEBUG = True` in settings and then `sudo supervisorctl restart mysite`, reload page.
