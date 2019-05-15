@@ -79,10 +79,23 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 * Set up login with a key pair, if needed on your local computer generate keys, otherwise reuse the key you have. View your public key by executing (locally) in bash `cat ~/.ssh/id_rsa.pub` and copy *all* of the output. 
 * To put it on the server, use `mkdir ~/.ssh` to create the directory, `chmod 700 ~/.ssh` to change permissions, `nano ~/.ssh/authorized_keys` (nano is a text editor, you can also use vim) to put the key in this file and `chmod 600 ~/.ssh/authorized_keys`.
 * Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
+
+# Firewall and fail2ban
 * Install a firewall, `sudo apt-get install ufw`.
 * Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx` where `xxx` is a port number.
 * `sudo ufw enable` and check with `sudo ufw status`.
 * Before closing your existing connection to the server, check if you can login to a new session! Otherwise you could lock yourself out.
+* Besides a firewall, you also want to protect your server against bots that repeatedly try to guess your password, for that you can install `sudo apt install -y fail2ban`.
+* Create a new file `sudo nano /etc/fail2ban/jail.local` and put into it
+```
+[sshd]
+enabled = true
+port = 22
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+```
+* Start and enable (start on boot) the service with `sudo systemctl start fail2ban` and `sudo systemctl enable fail2ban`.
 
 ## Local setup
 * Add your server to PyCharm in Settings | Build, Execution, Deployment | Deployment, click on the plus icon, choose SFTP, enter the IP address of your server in SFTP host, specify user name, choose as authentication Key Pair and specify your key file, for Windows probably in `C:\Users\username\.ssh\id_rsa`. Also, if not already done, specify web server url as `http://ipadress`. If you get the error 'Keypair is corrupt or has unknown format', then try selecting OpenSSH config as Authentication instead.
