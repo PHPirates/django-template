@@ -3,18 +3,53 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1e52d96b4c3b4bc586827a483287ec3c)](https://www.codacy.com/app/PHPirates/django-template?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PHPirates/django-template&amp;utm_campaign=Badge_Grade)
 [![Codeclimate](https://api.codeclimate.com/v1/badges/7ee6b92b294863348693/maintainability)](https://codeclimate.com/github/PHPirates/django-template/maintainability)
 
-# Django template project
+# Django template project and deployment tutorial
 
-## Table of Contents
-* Instructions to run the website on a local computer
-* Instructions to run the website on a server
+### Makes use of
 
-#### Makes use of
+#### For the website:
 * PostgreSQL
 * The [TinyMCE](https://www.tinymce.com/) editor
 * HTML templates
 * CSS
 * Directory structure from [docs.djangoproject.com](https://docs.djangoproject.com/en/1.11/intro/tutorial01/).
+
+#### For deployment:
+* A PostgreSQL database
+* gunicorn to serve the website
+* nginx to 'reverse proxy' requests from outside to gunicorn
+* PyCharm for local and remote development
+* supervisor to manage gunicorn
+
+This guide has been tested a lot of times on Ubuntu 16.04, 18.04 and even Arch Linux.
+
+## Table of Contents
+- [Instructions to run the website locally](#instructions-to-run-the-website-locally)
+  * [Setting up postgres locally](#setting-up-postgres-locally)
+- [Deploying on an Ubuntu server](#deploying-on-an-ubuntu-server)
+  * [Buy the necessary services](#buy-the-necessary-services)
+  * [Setting up users and login](#setting-up-users-and-login)
+  * [Firewall and fail2ban](#firewall-and-fail2ban)
+  * [Local setup](#local-setup)
+  * [Setting up postgres](#postgres)
+  * [Setting up a virtual environment](#setting-up-a-virtual-environment)
+  * [Uploading project](#uploading-project)
+  * [Installing dependencies](#installing-dependencies)
+  * [Setting up gunicorn](#setting-up-gunicorn)
+  * [Setting up supervisor](#setting-up-supervisor)
+  * [Setting up nginx](#setting-up-nginx)
+  * [Setting up HTTPS](#setting-up-https)
+  * [Start nginx](#start-nginx)
+    + [Setting up automatic renewal of https certificates](#setting-up-automatic-renewal-of-https-certificates)
+  * [<a name="remember">To remember</a>](#-a-name--remember--to-remember--a-)
+    + [Django files](#django-files)
+    + [Django models](#django-models)
+    + [Static files](#static-files)
+    + [Supervisor config](#supervisor-config)
+    + [gunicorn start script](#gunicorn-start-script)
+    + [nginx config](#nginx-config)
+    + [logs](#logs)
+
 
 # Instructions to run the website locally
 
@@ -80,7 +115,7 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 * To put it on the server, use `mkdir ~/.ssh` to create the directory, `chmod 700 ~/.ssh` to change permissions, `nano ~/.ssh/authorized_keys` (nano is a text editor, you can also use vim) to put the key in this file and `chmod 600 ~/.ssh/authorized_keys`.
 * Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
 
-# Firewall and fail2ban
+## Firewall and fail2ban
 * Install a firewall, `sudo apt-get install ufw`.
 * Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx` where `xxx` is a port number.
 * `sudo ufw enable` and check with `sudo ufw status`.
