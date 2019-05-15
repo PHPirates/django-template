@@ -154,11 +154,15 @@ then the previous steps could be the problem (or your firewall is still blocking
 * If you did set the virtual environment up without pip, download it with `wget https://bootstrap.pypa.io/get-pip.py`, install with `python3.6 get-pip.py`. 
 * Check with `which pip` and `which python` that everything points inside your virtual environment. If you do need to use for example python3.6 instead of python, remember that or fix the `python` command to avoid mistakes.
 
-## Uploading project and installing dependencies
+## Uploading project
 * `cd mysite_env` and `sudo mkdir mysite`, then correct ownership with `sudo chown -R eve:eve /opt/`.
 * In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. 
 * Under Options (click on the arrow next to Deployment in the left menu) you can specify to upload changes automatically or if you hit `CTRL+S`. Click Ok.
-* Select in the PyCharm project view on the left all the files and folders you want to upload (probably everything except any local virtual environment) and try to upload your files with `CTRL+S` (if you chose that option) or if that doesn't work, try Tools | Deployment | Upload to ...
+* You don't want to upload everything you have locally to the server, for example it makes no sense to upload files in your local virtual environment. To exclude these paths, go to Settings | Build, Execution, Deployment | Deployment | Excluded Paths and add them, by hitting the plus icon and choosing Local Path.
+    * You may notice that if you try to exclude a folder which is marked as Excluded in PyCharm (not excluded from upload, but excluded like not belonging to the project, which you can see as the folder is marked red) then you cannot exclude it from deployment and you will get a message saying 'Local path is out of project'. This is a bug in PyCharm, vote for it at https://youtrack.jetbrains.com/issue/WI-7367. To exclude these folders for deployment, first unmark them as excluded by right-clicking on them and choosing Mark Directory as | Cancel Exclusion. Now you can exclude them for deployment, and mark them again as excluded after you did that (PyCharm will give an error in the settings but it will still work).
+* Now theoretically you should be able to upload everything by hitting <kbd>Ctrl</kbd>+<kbd>S</kbd>, but we have found that often this does not work. A more reliable way is to first select your project folder in the project view on the left (probably the topmost folder) and selecting Tools | Deployment | Upload to ..., or using the default shortcut <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> and choosing your server.
+
+## Installing dependencies
 * If you need `msqlclient`, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
 * If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings | Project ... | Project Interpreter and add a new remote one by selecting the gear icon at the top right.
 * Select SSH Interpreter in the left menu, then Existing Server Configuration, select as Deployment Configuration your server and Move Deployment Server, then select the right path to your python _of the virtual environment_.
