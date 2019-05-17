@@ -111,7 +111,7 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 ## Setting up users and login
 
 * If you already have a second user besides root, skip this step. Otherwise, log in via SSH with the root user. Create a new user with your name with `adduser eve`. Give her root permissions with `usermod -aG sudo eve`. Impersonate her with `sudo su - eve`. Note you have to do this and the next three instructions (adding a public key) for every user you want to give access to the server.
-* Set up login with a key pair, if needed on your local computer generate keys, otherwise reuse the key you have. View your public key by executing (locally) in bash `cat ~/.ssh/id_rsa.pub` and copy *all* of the output. 
+* Set up login with a key pair, if needed on your local computer generate keys with `ssh-keygen -t rsa`, otherwise reuse the key you have. View your public key by executing (locally) in bash `cat ~/.ssh/id_rsa.pub` and copy *all* of the output. 
 * To put it on the server, use `mkdir ~/.ssh` to create the directory, `chmod 700 ~/.ssh` to change permissions, `nano ~/.ssh/authorized_keys` (nano is a text editor, you can also use vim) to put the key in this file and `chmod 600 ~/.ssh/authorized_keys`.
 * Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
 
