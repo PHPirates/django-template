@@ -103,11 +103,12 @@ It makes life easier if you also use **PyCharm**, and **supervisor** to manage g
 1. If you don't have a domain yet, you can probably buy it via the same company as you bought the VPS. If you have one, you can probably transfer the management of it to that company. You could also leave it as you have it, and just point the DNS to the ip address of the VPS.
 
 From now on we assume that the server is already up and running and that you can execute `sudo` commands via SSH, for example using `ssh root@xxx.xxx.xxx.xxx` in bash.
-If not, for example because you have walked through the Ubuntu installation yourself, make sure you install `openssh-server` (with `sudo apt-get install openssh-server`).
+If not, for example because you have walked through the Ubuntu installation yourself, make sure you install `openssh-server` (with `sudo apt install openssh-server`).
 If you cannot access because you have no root password, you should have created an other user, say `eve`.
 Then you should be able to login with `eve` instead of `root`.
 
-Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
+Run `sudo apt update` and `sudo apt upgrade` before anything.
+Random remark: note that `apt` is the user command, `apt-get` is the low-level command useful for scripting.
 
 ## Setting up users and login
 
@@ -117,7 +118,7 @@ Run `sudo apt-get update` and `sudo apt-get upgrade` before anything.
 1. Test that it works by opening a new bash window and check that you can login with eve without needing to enter your password.
 
 ## Firewall and fail2ban
-1. Install a firewall, `sudo apt-get install ufw`.
+1. Install a firewall, `sudo apt install ufw`.
 1. Allow SSH (22), Postgres (5432), http (80) and https (443) and other things you can think of: `sudo ufw allow xxx` where `xxx` is a port number.
 1. `sudo ufw enable` and check with `sudo ufw status`.
 1. Before closing your existing connection to the server, check if you can login to a new session! Otherwise you could lock yourself out.
@@ -143,7 +144,7 @@ maxretry = 3
 
 1. If needed (and if you already want your website domain to point to this VPS) point your (sub)domain to the ip address of your server, probably in the settings of the provider where you registered the domains. This can take a few hours to take effect.
 
-1. Install the packages we need with `sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx`.
+1. Install the packages we need with `sudo apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx`.
 
 ## <a name="postgres">Setting up postgres</a>
 1. Start a postgres session with `sudo -u postgres psql`.
@@ -185,26 +186,26 @@ then the previous steps could be the problem (or your firewall is still blocking
 1. I happen to want my virtual environments in `/opt/` so I do `cd /opt`.
     * (if you are the only person who is ever going to work on it, putting it in `/home/username` would avoid some permission problems)
 1. Make sure you create a virtual environment with the latest python you installed! Creating a virtual environment appears to be very much liable to change with python versions, so if the following steps don't work just search for instructions for your specific environment.
-1. Install venv with `sudo apt-get install python3-venv`.
-1. I had python 3.5 installed, checked with `python3.5 -V`. Then you should be able to create a virtual environment with `sudo python3.5 -m venv mysite_env`.
-1. If that does not work, I once solved that under python 3.6 by doing `sudo python3.6 -m venv --without-pip mysite_env`, `source mysite_env/bin/activate`, `sudo apt-get install curl`, then found out curl doesn't run as sudo so did `sudo bash -c "curl https://bootstrap.pypa.io/get-pip.py | python"` then `deactivate`. 
+1. Install venv with `sudo apt install python3-venv`.
+1. I had python 3.5 installed, checked with `python3.5 -V`. Then you should be able to create a virtual environment with `sudo python3.5 -m venv mysite_env`. Same for 3.7 etc.
+    * If that does not work, I once solved that under python 3.6 by doing `sudo python3.6 -m venv --without-pip mysite_env`, `source mysite_env/bin/activate`, `sudo apt install curl`, then found out curl doesn't run as sudo so did `sudo bash -c "curl https://bootstrap.pypa.io/get-pip.py | python"` then `deactivate`. 
 1. Every time you want to do something in your virtual environment, activate it with (change `mysite` to your website name) `source mysite_env/bin/activate`. Do so, now.
-1. Check with `python -V` for correct python version.
-1. If you did set the virtual environment up without pip, download it with `wget https://bootstrap.pypa.io/get-pip.py`, install with `python3.6 get-pip.py`. 
-1. Check with `which pip` and `which python` that everything points inside your virtual environment. If you do need to use for example python3.6 instead of python, remember that or fix the `python` command to avoid mistakes.
+1. Check with `python -V` for correct python version, and `pip -V` for correct pip version in the correct location (should be in the virtual environment).
+    * If you did set the virtual environment up without pip, download it with `wget https://bootstrap.pypa.io/get-pip.py`, install with `python3.6 get-pip.py`. 
+1. Check with `which pip` and `which python` that everything points inside your virtual environment. If you do need to use for example `python3.6` instead of `python`, remember that or fix the `python` command to avoid mistakes.
 
 ## Uploading project
 1. `cd mysite_env` and `sudo mkdir mysite`, then correct ownership with `sudo chown -R eve:eve /opt/`.
 1. In PyCharm, go to the deployment settings of your server as before and edit Root path to the directory you just created, so `/opt/mysite_env/mysite`. Under Mappings, specify `/` as Deployment Path. 
 1. Under Options (click on the arrow next to Deployment in the left menu) you can specify to upload changes automatically or if you hit `CTRL+S`. Click Ok.
 1. You don't want to upload everything you have locally to the server, for example it makes no sense to upload files in your local virtual environment. To exclude these paths, go to Settings | Build, Execution, Deployment | Deployment | Excluded Paths and add them, by hitting the plus icon and choosing Local Path.
-    * You may notice that if you try to exclude a folder which is marked as Excluded in PyCharm (not excluded from upload, but excluded like not belonging to the project, which you can see as the folder is marked red) then you cannot exclude it from deployment and you will get a message saying 'Local path is out of project'. This is a bug in PyCharm, vote for it at https://youtrack.jetbrains.com/issue/WI-7367. To exclude these folders for deployment, first unmark them as excluded by right-clicking on them and choosing Mark Directory as | Cancel Exclusion. Now you can exclude them for deployment, and mark them again as excluded after you did that (PyCharm will give an error in the settings but it will still work).
+    * You may notice that if you try to exclude a folder which is marked as Excluded in PyCharm (not excluded from upload, but excluded like not belonging to the project, which you can see as the folder is marked red) then you cannot exclude it from deployment and you will get a message saying 'Local path is out of project'. (Note, however, that sometimes you *can* exclude it even though you get the warning.) This is a bug in PyCharm, vote for it at https://youtrack.jetbrains.com/issue/WI-7367. To exclude these folders for deployment, first unmark them as excluded by right-clicking on them and choosing Mark Directory as | Cancel Exclusion. Now you can exclude them for deployment, and mark them again as excluded after you did that (PyCharm will give an error in the settings but it will still work).
 1. Now theoretically you should be able to upload everything by hitting <kbd>Ctrl</kbd>+<kbd>S</kbd>, but we have found that often this does not work. A more reliable way is to first select your project folder in the project view on the left (probably the topmost folder) and selecting Tools | Deployment | Upload to ..., or using the default shortcut <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> and choosing your server.
 
 ## Installing dependencies
-1. If you need `msqlclient`, first install `sudo apt-get install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
+1. If you need `msqlclient`, first install `sudo apt install python3.5-dev libmysqlclient-dev` which are needed for the `mysqlclient` package.
 1. If you didn't remember, check with `which python` (with virtualenv activated) where your python hides, then in PyCharm go to Settings | Project ... | Project Interpreter and add a new remote one by selecting the gear icon at the top right.
-1. Select SSH Interpreter in the left menu, then Existing Server Configuration, select as Deployment Configuration your server and Move Deployment Server, then select the right path to your python _of the virtual environment_.
+1. Select SSH Interpreter in the left menu, then Existing Server Configuration, select as Deployment Configuration your server and Move Deployment Server, then select the right path to your python _of the virtual environment_. Also take care to change the Sync paths.
 1. PyCharm should warn you about some dependencies from requirements.txt not being installed, do that. Probably PyCharm will also install helper files which can take a long time.
 1. Make sure you have the remote python selected as interpreter, (you can also check for package updates there), now you can just like before hit Tools | Run Manage.py Task and run `makemigrations` and `migrate` but now both with production settings: so `makemigrations --settings=mysite.settings.production` and also for `migrate`.
 1. If that fails, try running these tasks manually, so go to `/opt/mysite_env/mysite` and run `python manage.py makemigrations` and same for `migrate`.
@@ -218,13 +219,13 @@ then the previous steps could be the problem (or your firewall is still blocking
 
 ## Setting up supervisor
 1. We use supervisor to manage the starting and stopping of gunicorn. If your server would crash or for whatever reason is restarted, this makes sure to automatically start your website too.
-1. Install with `sudo apt-get install supervisor`.
+1. Install with `sudo apt install supervisor`.
 1. Put the file [`mysite.conf`](server%20configuration%20files/mysite.conf) in `sudo nano /etc/supervisor/conf.d/mysite.conf`, make sure it has executable permissions just like with the gunicorn start script.
 1. Every time after you change such a supervisor config file, you have to do `sudo supervisorctl reread` and `sudo supervisorctl update`. Do this now. I gathered things to remember like this [below](#remember).
 1. You can manually restart with `sudo supervisorctl restart mysite`.
 
 ## Setting up nginx
-1. Install with `sudo apt-get install nginx`
+1. Install with `sudo apt install nginx`
 1. If you do not have the folders `/etc/nginx/sites-available/` and `/etc/nginx/sites-enabled`, you can create them and you also need to include them by putting in `/etc/nginx/nginx.conf` at the bottom of the `http` block the following:
 ```
 include /etc/nginx/conf.d/*.conf;
